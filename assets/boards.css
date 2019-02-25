@@ -1,0 +1,74 @@
+body {
+    background: rgba(17, 23, 35, 1.0);
+    color: rgba(255, 255, 255, 0.4);
+    padding: 1px 0 0 0;
+    overflow-x: none;
+    margin: 0;
+}
+
+.category .category,
+.category .board {
+    margin: 0 0 1px 0;
+    min-height: 0;
+    overflow: visible;
+    padding: 10px;
+    position: relative;
+    width: auto;
+    z-index: initial;
+}
+
+.category .category {
+    background: rgba(57, 78, 99, 1.0);
+    color: rgba(255, 255, 255, 1.0);
+}
+
+.category .board {
+    background: rgba(81, 103, 126, 1.0);
+    color: rgba(255, 255, 255, 1.0);
+    display: none;
+}
+
+.category .board .title,
+.category .category .title {
+    color: rgba(255, 255, 255, 1.0);
+    font-size: 1.2em;
+}
+
+.category .board .subtitle,
+.category .category .subtitle {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 1em;
+}
+
+.fab-menu {
+    bottom: 15px;
+    position: fixed;
+    right: 15px;
+}
+
+.fab-menu button {
+    background-color: #ff0000;
+    border: 0;
+    border-radius: 100%;
+    box-shadow: 0 3px 6px;  // 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    display: block;
+    height: 55px;
+    outline: none;
+    width: 55px;
+}
+
+.fab-menu .menu {
+    margin: 10px 0 0 0;
+}
+
+.fab-menu .menu-item {
+    margin: 0 0 5px 0;
+}
+
+.fab-menu .menu-item-hidden {
+    display: none;
+}
+
+.fab-menu .button .material-icons {
+    vertical-align: text-bottom;
+}

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width,user-scalable=yes,initial-scale=1">
+
+    <link href="/assets/material-icons.css" type="text/css" rel="stylesheet">
+    <link href="/assets/board.css" type="text/css" rel="stylesheet">
+</head>
+<body onpageshow="onPageShow()">
+<div class="board"
+     data-board-id="{{boardId}}"
+     data-board-title="{{boardTitle}}"
+     data-page="{{boardPage}}">
+    {{#threads}}
+    <div class="thread{{#isSpecial}}-special{{/isSpecial}}"
+         data-thread-id="{{id}}"
+         data-number-of-pages="{{nrPages}}">
+        <div class="icons">
+            {{#isClosed}}
+            <i class="material-icons">&#xe897;</i>
+            {{/isClosed}}
+            {{#isAnnouncement}}
+            <i class="material-icons">&#xe85a;</i>
+            {{/isAnnouncement}}
+            {{#isImportant}}
+            <i class="material-icons">&#xe892;</i>
+            {{/isImportant}}
+            {{#isSticky}}
+            <i class="material-icons">&#xe55e;</i>
+            {{/isSticky}}
+            {{#isGlobal}}
+            <i class="material-icons">&#xe894;</i>
+            {{/isGlobal}}
+        </div>
+        <div class="title">
+            <div class="icon">
+                {{&icon}}
+            </div>
+            {{#isClosed}}
+            <strike>{{title}}</strike>
+            {{/isClosed}}
+            {{^isClosed}}
+            {{title}}
+            {{/isClosed}}
+        </div>
+        <div class="subtitle">
+            {{subtitle}}
+        </div>
+        <div class="info">
+            <div class="numbers">
+                {{nrReplies}} {{#replies}}{{nrReplies}}{{/replies}}, {{nrPages}} {{#pages}}{{nrPages}}{{/pages}}
+            </div>
+            <div class="lastpost">
+                Letzter Beitrag von {{lastPostUser}} ({{lastPostDate}})
+            </div>
+        </div>
+    </div>
+    {{/threads}}
+</div>
+
+<div class="fab-menu">
+    <button class="menu-item menu-item-refresh menu-item-hidden"><i class="material-icons">refresh</i></button>
+    <button class="menu-item menu-item-back menu-item-hidden"><i class="material-icons">arrow_back</i></button>
+    <button class="menu"><i class="material-icons">menu</i></button>
+</div>
+
+<script src="/assets/jquery.min.js"></script>
+<script src="/assets/jquery.mobile.custom.min.js"></script>
+<script src="/assets/board.js"></script>
+</body>
+</html>

@@ -1,0 +1,367 @@
+body {
+    padding:7px 0 0 0;
+    overflow-x: none;
+    margin:0;
+}
+
+.post .header,
+.post .body {
+    padding:10px;
+}
+
+.post {
+    margin:0 7px 7px 7px;
+    width:auto;
+    min-height:0;
+    z-index:initial;
+    overflow:visible;
+    position:relative;
+}
+
+.post .header .post-buttons {
+    float:right;
+}
+
+.post .header {
+    overflow:auto;
+}
+
+.post .header .bender {
+    background: url("/assets/bender.png") left top / contain no-repeat;
+    width:50px;
+    height:50px;
+    float:left;
+}
+
+.post .body {
+    overflow:auto;
+    width:auto;
+}
+
+.post .header .author  {
+    font-size:1.0em;
+    margin:0;
+}
+
+.post .header .info .title,
+.post .header .info .date {
+    font-size:0.9em;
+}
+
+.post .header .author,
+.post .header .info .title,
+.post .header .info .date {
+    width: 100%;
+}
+
+.post.newpost:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-width: 0 16px 16px 0;
+    border-style: solid;
+}
+
+.post .body .media {
+    width:100%;
+    display:block;
+    margin:5px 0;
+    color: inherit;
+    text-align:right;
+}
+
+.post .body .media i {
+    font-size:34px;
+    float:left;
+}
+
+.post .body .media button {
+    font-size:12px;
+    padding:10px 15px;
+    text-transform: uppercase;
+}
+
+.post .body .strike {
+    text-decoration: line-through;
+}
+
+.post .body .code {
+    font-family: monospace;
+    white-space: pre;
+    padding:5px;
+}
+
+.post .body .inline {
+    display:inline;
+}
+
+.post .body .quote {
+    font-size:1em;
+    padding:5px;
+    border:0;
+}
+
+.post .body .quote a.author {
+    margin:-5px -5px 5px -5px;
+    padding:5px;
+    display:block;
+    font-weight:normal;
+    text-decoration:none;
+    font-style: normal;
+}
+
+.post .body .quote .author i {
+    font-size:1.2em;
+    float:right;
+}
+
+.post .body .videoWrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    padding-top: 25px;
+    height: 0;
+}
+
+.post .body .videoWrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.post .body  table {
+    border-collapse:collapse;
+}
+
+.post .body  table tr td {
+    padding:3px;
+}
+
+.post .body .spoiler .spoiler-content {
+    display:none;
+    text-align:left;
+    padding:5px;
+}
+
+.post .body .edited {
+    margin-top:1em;
+    color:#aaa;
+    font-size:0.7em;
+}
+
+.post .body .trigger {
+    font-size:0.8em;
+}
+
+.post .body .mod {
+    font-size:1.2em;
+}
+
+.post .body .content img {
+    max-width:100%;
+}
+
+.post .body table {
+    border-collapse:collapse;
+}
+
+.post .body table tr td {
+    padding:3px;
+}
+
+.post.oldpost {
+    opacity: 0.5;
+}
+
+@-webkit-keyframes spin {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(-360deg); }
+}
+
+.spin {
+    display:inline-block;
+    -webkit-animation-name: spin;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-duration: 1s;
+}
+
+button {
+    position: relative;
+    overflow: hidden;
+    outline:none;
+    background:none;
+    border:0;
+}
+
+button:after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 120px;
+    height: 120px;
+    margin-left: -60px;
+    margin-top: -60px;
+    background: #fff;
+    border-radius: 100%;
+    opacity: .6;
+    transform: scale(0);
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+    }
+    20% {
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1);
+    }
+}
+
+button:not(:active):after {
+    animation: ripple 1s ease-out;
+}
+
+/* fixes initial animation run, without user input, on page load.
+ */
+button:after {
+    visibility: hidden;
+}
+
+button:focus:after {
+    visibility: visible;
+}
+
+body {
+    background: rgba(17, 23, 35, 1.0);
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.post {
+    background: rgba(81, 103, 126, 1.0);
+}
+
+.post .header {
+    background: rgba(57, 78, 99, 1.0);
+}
+
+.post .header .author {
+    color: rgba(255, 255, 255, 1.0);
+}
+
+.post .header .info .title,
+.post .header .info .date {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.post .header .post-buttons i {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.post .body {
+    color: rgba(255, 255, 255, 1.0);
+}
+
+.post .body a {
+    color: rgba(255, 255, 255, 1.0);
+    text-decoration:underline;
+}
+
+.post .body .err {
+    background: rgba(204, 0, 0, 1.0);
+    color: rgba(255, 255, 255, 1.0);
+}
+
+.post .body .quote,
+.post .body .code {
+    background: rgba(34, 46, 58, 0.4);
+}
+
+.post .body .quote a.author {
+    background: rgba(34, 46, 58, 0.6666666666666666666666666666666666666666666666666666666);
+    color: rgba(255, 255, 255, 1.0);
+    text-decoration:none;
+}
+
+.post .body .media {
+    background: rgba(57, 78, 99, 1.0);
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.post .body .media button,
+.post .body .media i {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.post .media a,
+.post a .media i,
+.post a .media button {
+    text-decoration:none;
+}
+
+.post .body .quote a i {
+    color: rgba(255, 255, 255, 0.4);
+    text-decoration:none;
+}
+
+.post .body .media i.err {
+    color: rgba(204, 0, 0, 1.0);
+}
+
+.post .body .spoiler .spoiler-content {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.post.newpost:before {
+    border-color: rgba(230, 238, 156, 1.0) rgba(17, 23, 35, 1.0);
+}
+
+.post .body table tr td {
+    border: var(--border, 1px) solid rgba(57, 78, 99, 1.0);
+}
+
+.last-page-indicator {
+    font-size: 1em;
+    text-align: center;
+    padding: 0 7px 7px 7px;
+}
+
+.fab-menu {
+    bottom: 15px;
+    position: fixed;
+    right: 15px;
+}
+
+.fab-menu button {
+    background-color: #ff0000;
+    border: 0;
+    border-radius: 100%;
+    box-shadow: 0 3px 6px;  // 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    display: block;
+    height: 55px;
+    outline: none;
+    width: 55px;
+}
+
+.fab-menu .menu {
+    margin: 10px 0 0 0;
+}
+
+.fab-menu .menu-item {
+    margin: 0 0 5px 0;
+}
+
+.fab-menu .menu-item-hidden {
+    display: none;
+}
+
+.fab-menu .button .material-icons {
+    vertical-align: text-bottom;
+}

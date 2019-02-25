@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width,user-scalable=yes,initial-scale=1">
+
+    <link href="/assets/material-icons.css" type="text/css" rel="stylesheet">
+    <link href="/assets/thread.css" type="text/css" rel="stylesheet">
+
+    {{#initialAnchor}}
+    <script type="text/javascript">
+        var initialAnchor = '{{initialPostId}}';
+    </script>
+    {{/initialAnchor}}
+</head>
+<body onpageshow="onPageShow()">
+<div class="thread"
+     data-thread-id="{{threadId}}"
+     data-thread-title="{{threadTitle}}"
+     data-page="{{threadPage}}"
+     data-number-of-pages="{{threadNrPages}}">
+    {{#posts}}
+    <div class="post"
+         data-id="{{id}}"
+         data-user="{{author}}"
+         data-user-id="{{authorId}}"
+         data-user-avatar="{{avatar}}"
+         data-user-avatar-id="{{avatarId}}">
+        <a name="{{id}}"></a>
+        <div class="header">
+            <div class="bender" {{&avatarBackground}}></div>
+            <div class="info">
+                <h4 class="author">
+                    {{#getAuthorLocked}}
+                    <strike>{{author}}</strike>
+                    {{/getAuthorLocked}}
+                    {{^getAuthorLocked}}
+                    {{author}}
+                    {{/getAuthorLocked}}
+                </h4>
+                <div class="title">
+                    {{&icon}}
+                    {{title}}
+                </div>
+                <div class="date">
+                    {{date}}
+                </div>
+            </div>
+        </div>
+        <div class="body">
+            <div class="content">
+                {{&text}}
+                {{#isEdited}}
+                <div class="edited">{{numEdited}}x bearbeitet, zuletzt von {{lastEditUser}}, {{lastEditDate}}</div>
+                {{/isEdited}}
+            </div>
+        </div>
+    </div>
+    {{/posts}}
+    {{#isLastPage}}
+    <div class="last-page-indicator">
+        Ende der letzten Seite erreicht.
+    </div>
+    {{/isLastPage}}
+</div>
+
+<div class="fab-menu">
+    <button class="menu-item menu-item-refresh menu-item-hidden"><i class="material-icons">refresh</i></button>
+    <button class="menu-item menu-item-back menu-item-hidden"><i class="material-icons">arrow_back</i></button>
+    <button class="menu"><i class="material-icons">menu</i></button>
+</div>
+
+<script src="/assets/jquery.min.js"></script>
+<script src="/assets/jquery.mobile.custom.min.js"></script>
+<script src="/assets/thread.js"></script>
+</body>
+</html>
