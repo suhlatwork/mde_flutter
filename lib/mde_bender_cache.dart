@@ -23,7 +23,8 @@ class MDEBenderCache {
 
   Future<bool> _check(final String cleanUri) async {
     final String baseDir = (await getTemporaryDirectory()).path;
-    final String fullPath = join(baseDir, 'bender', joinAll(url.split(cleanUri)));
+    final String fullPath =
+        join(baseDir, 'bender', joinAll(url.split(cleanUri)));
 
     File file = File(fullPath);
     if (await file.exists()) {
@@ -44,8 +45,14 @@ class MDEBenderCache {
       return false;
     }
 
-    debugPrint(Uri.http('forum.mods.de', url.join('bb', cleanUri)).toString());
-    http.Response response = await http.get(Uri.http('forum.mods.de', url.join('bb', cleanUri)));
+    debugPrint(Uri.http(
+      'forum.mods.de',
+      url.join('bb', cleanUri),
+    ).toString());
+    http.Response response = await http.get(Uri.http(
+      'forum.mods.de',
+      url.join('bb', cleanUri),
+    ));
 
     await File(fullPath).writeAsBytes(response.bodyBytes);
 

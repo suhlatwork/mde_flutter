@@ -95,8 +95,16 @@ class _TexTag extends BBCodeTag {
 
   @override
   String toHtml(final String inner, final String argument) {
-    Uri uri = Uri.https('chart.googleapis.com', 'chart',
-        {'chco': 'ffffff', 'chf': 'bg,s,394E63', 'cht': 'tx', 'chl': inner});
+    Uri uri = Uri.https(
+      'chart.googleapis.com',
+      'chart',
+      {
+        'chco': 'ffffff',
+        'chf': 'bg,s,394E63',
+        'cht': 'tx',
+        'chl': inner,
+      },
+    );
     return '<img src="$uri" class="tex" />';
   }
 }
@@ -319,37 +327,42 @@ _processMDEBBCode(BBCodePart part) {
 
 class MDEBBCodeParser extends BBCodeParser {
   MDEBBCodeParser()
-      : super([
-          BBCodeBoldTag(),
-          BBCodeUnderlineTag(),
-          BBCodeItalicTag(),
-          BBCodeListTag(),
-          BBCodeListItemTag(),
-          BBCodeTableTag(),
-          BBCodeTableRowTag(),
-          BBCodeTableColumnTag(),
-          _QuoteTag(),
-          _MonospaceTag(),
-          _StrikeTag(),
-          _ModTag(),
-          _SpoilerTag(),
-          _TriggerTag(),
-          _CodeTag(),
-          _TexTag(),
-          _ImageTag(),
-          _VideoTag(),
-          _UrlTag(),
-        ],
-            emojiParser: BBCodeEmojiParser(
-                mdeSmileys,
-                <BBCodeTag>[
-                  _CodeTag(),
-                  _TexTag(),
-                  _ImageTag(),
-                  _VideoTag(),
-                  _UrlTag()
-                ].map((element) {
-                  return element.bbTag;
-                }).toList()),
-            htmlPostProcessor: _processMDEBBCode);
+      : super(
+          <BBCodeTag>[
+            BBCodeBoldTag(),
+            BBCodeUnderlineTag(),
+            BBCodeItalicTag(),
+            BBCodeListTag(),
+            BBCodeListItemTag(),
+            BBCodeTableTag(),
+            BBCodeTableRowTag(),
+            BBCodeTableColumnTag(),
+            _QuoteTag(),
+            _MonospaceTag(),
+            _StrikeTag(),
+            _ModTag(),
+            _SpoilerTag(),
+            _TriggerTag(),
+            _CodeTag(),
+            _TexTag(),
+            _ImageTag(),
+            _VideoTag(),
+            _UrlTag(),
+          ],
+          emojiParser: BBCodeEmojiParser(
+            mdeSmileys,
+            <BBCodeTag>[
+              _CodeTag(),
+              _TexTag(),
+              _ImageTag(),
+              _VideoTag(),
+              _UrlTag(),
+            ].map(
+              (element) {
+                return element.bbTag;
+              },
+            ).toList(),
+          ),
+          htmlPostProcessor: _processMDEBBCode,
+        );
 }

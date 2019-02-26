@@ -7,9 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'http_server.dart';
-import 'template_filler.dart';
 
-class MainViewer<T extends TemplateFiller> extends StatefulWidget {
+class MainViewer extends StatefulWidget {
   @override
   _MainViewerState createState() => _MainViewerState();
 }
@@ -32,66 +31,70 @@ class _MainViewerState extends State<MainViewer> with WidgetsBindingObserver {
         title: Text(_appBarTitle),
       ),
       body: Center(
-          child: WillPopScope(
-        child: FutureBuilder(
+        child: WillPopScope(
+          child: FutureBuilder(
             future: HttpServerWrapper.port.future,
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (snapshot.hasData) {
                 return WebView(
-                    // TODO: remove after https://github.com/flutter/flutter/issues/24585
-                    gestureRecognizers:
-                        Set<Factory<OneSequenceGestureRecognizer>>.of([
-                      Factory<TapGestureRecognizer>(
-                          () => TapGestureRecognizer()),
-                      Factory<LongPressGestureRecognizer>(
-                          () => LongPressGestureRecognizer()),
-                    ]),
-                    initialUrl: Uri.http('', '')
-                        .replace(
-                          host: InternetAddress.loopbackIPv6.host,
-                          path: '/boards',
-                          port: snapshot.data,
-                        )
-                        .toString(),
-                    javascriptChannels: Set<JavascriptChannel>.of([
-                      JavascriptChannel(
-                          name: 'appBarTitleSetter',
-                          onMessageReceived: (final JavascriptMessage message) {
-                            _handleAppBarTitleSetter(message.message);
-                          }),
-                      JavascriptChannel(
-                          name: 'errorDisplay',
-                          onMessageReceived: (final JavascriptMessage message) {
-                            _handleErrorDisplay(context, message.message);
-                          }),
-                      JavascriptChannel(
-                          name: 'urlOpener',
-                          onMessageReceived: (final JavascriptMessage message) {
-                            _handleUrlOpener(context, message.message);
-                          }),
-                    ]),
-                    javascriptMode: JavascriptMode.unrestricted,
-                    onWebViewCreated: (WebViewController controller) {
-                      _controllerCompleter.complete(controller);
-                    });
+                  // TODO: remove after https://github.com/flutter/flutter/issues/24585
+                  gestureRecognizers:
+                      Set<Factory<OneSequenceGestureRecognizer>>.of([
+                    Factory<TapGestureRecognizer>(() => TapGestureRecognizer()),
+                    Factory<LongPressGestureRecognizer>(
+                        () => LongPressGestureRecognizer()),
+                  ]),
+                  initialUrl: Uri.http('', '')
+                      .replace(
+                        host: InternetAddress.loopbackIPv6.host,
+                        path: '/boards',
+                        port: snapshot.data,
+                      )
+                      .toString(),
+                  javascriptChannels: Set<JavascriptChannel>.of([
+                    JavascriptChannel(
+                      name: 'appBarTitleSetter',
+                      onMessageReceived: (final JavascriptMessage message) {
+                        _handleAppBarTitleSetter(message.message);
+                      },
+                    ),
+                    JavascriptChannel(
+                      name: 'errorDisplay',
+                      onMessageReceived: (final JavascriptMessage message) {
+                        _handleErrorDisplay(context, message.message);
+                      },
+                    ),
+                    JavascriptChannel(
+                      name: 'urlOpener',
+                      onMessageReceived: (final JavascriptMessage message) {
+                        _handleUrlOpener(context, message.message);
+                      },
+                    ),
+                  ]),
+                  javascriptMode: JavascriptMode.unrestricted,
+                  onWebViewCreated: (WebViewController controller) {
+                    _controllerCompleter.complete(controller);
+                  },
+                );
               } else {
                 return CircularProgressIndicator();
               }
-            }),
-        onWillPop: () async {
-          if (await (await _controllerCompleter.future).canGoBack()) {
-            (await _controllerCompleter.future).goBack();
-            return false;
-          }
-          return true;
-        },
-      )),
+            },
+          ),
+          onWillPop: () async {
+            if (await (await _controllerCompleter.future).canGoBack()) {
+              (await _controllerCompleter.future).goBack();
+              return false;
+            }
+            return true;
+          },
+        ),
+      ),
     );
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // TODO: implement didChangeAppLifecycleState
     super.didChangeAppLifecycleState(state);
 
     if (state == AppLifecycleState.resumed) {

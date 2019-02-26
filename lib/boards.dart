@@ -15,10 +15,15 @@ class Boards with TemplateFiller {
   }
 
   _fetchBoards() async {
-    debugPrint(Uri.http('forum.mods.de', 'bb/xml/boards.php').toString());
+    debugPrint(Uri.http(
+      'forum.mods.de',
+      'bb/xml/boards.php',
+    ).toString());
 
-    final http.Response response =
-        await http.get(Uri.http('forum.mods.de', 'bb/xml/boards.php'));
+    final http.Response response = await http.get(Uri.http(
+      'forum.mods.de',
+      'bb/xml/boards.php',
+    ));
 
     if (response.statusCode == 200) {
       // if the call to the server was successful, parse the XML
@@ -29,13 +34,16 @@ class Boards with TemplateFiller {
       final xml.XmlDocument document =
           xml.parse(utf8.decode(response.bodyBytes));
 
-      Map<String, Object> boardsInfo = {'categories': []};
+      Map<String, Object> boardsInfo = {
+        'categories': [],
+      };
 
       // the XML document should only contain one rootElement 'categories'
       final xml.XmlElement categories = document.rootElement;
       if (categories.name.qualified != 'categories') {
         throw XmlError.forBoards(
-            error: 'Root element needs to be "categories".');
+          error: 'Root element needs to be "categories".',
+        );
       }
 
       // the element 'categories' should contain an attribute 'count' which should
@@ -51,7 +59,9 @@ class Boards with TemplateFiller {
 
       // loop over categories to get the individual boards
       for (final xml.XmlElement category in categories.children) {
-        Map<String, Object> categoryInfo = {'boards': []};
+        Map<String, Object> categoryInfo = {
+          'boards': [],
+        };
 
         if (category.name.qualified != 'category') {}
 
@@ -84,7 +94,8 @@ class Boards with TemplateFiller {
 
           if (board.name.qualified != 'board') {
             throw XmlError.forBoards(
-                error: 'All child elements of "boards" should be "board".');
+              error: 'All child elements of "boards" should be "board".',
+            );
           }
 
           final int boardId = int.parse(board.getAttribute('id'));
@@ -93,8 +104,9 @@ class Boards with TemplateFiller {
           candidates = board.findElements('name');
           if (candidates.length != 1) {
             throw XmlError.forBoards(
-                error:
-                    'A "board" element does not contain exactly one "name" child.');
+              error:
+                  'A "board" element does not contain exactly one "name" child.',
+            );
           }
           final String boardName = candidates.first.text;
           boardInfo['name'] = boardName;
@@ -102,8 +114,9 @@ class Boards with TemplateFiller {
           candidates = board.findElements('description');
           if (candidates.length != 1) {
             throw XmlError.forBoards(
-                error:
-                    'A "board" element does not contain exactly one "description" child.');
+              error:
+                  'A "board" element does not contain exactly one "description" child.',
+            );
           }
           final String boardDescription = candidates.first.text;
           boardInfo['description'] = boardDescription;
@@ -121,8 +134,9 @@ class Boards with TemplateFiller {
             candidates = lastPost.findElements('post');
             if (candidates.length != 1) {
               XmlError.forBoards(
-                  error:
-                      'A "lastpost" element does not contain exactly one "post" child.');
+                error:
+                    'A "lastpost" element does not contain exactly one "post" child.',
+              );
             }
             final xml.XmlElement lastPostPost = candidates.first;
 

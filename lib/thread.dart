@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:xml/xml.dart' as xml;
@@ -17,7 +17,11 @@ class Thread with TemplateFiller {
   final int threadPage;
   final int postId;
 
-  Thread({@required this.threadId, this.threadPage, this.postId}) {
+  Thread({
+    @required this.threadId,
+    this.threadPage,
+    this.postId,
+  }) {
     if (threadPage != null && postId != null) {
       throw ArgumentError(
           'at least one of "threadPage" or "postId" must be null');
@@ -27,17 +31,25 @@ class Thread with TemplateFiller {
   }
 
   _fetchThread() async {
-    debugPrint(Uri.http('forum.mods.de', 'bb/xml/thread.php', {
-      'TID': threadId.toString(),
-      'page': threadPage.toString(),
-      'PID': postId.toString(),
-    }).toString());
+    debugPrint(Uri.http(
+      'forum.mods.de',
+      'bb/xml/thread.php',
+      {
+        'TID': threadId.toString(),
+        'page': threadPage.toString(),
+        'PID': postId.toString(),
+      },
+    ).toString());
 
-    final http.Response response = await http.get(Uri.http('forum.mods.de', 'bb/xml/thread.php', {
-      'TID': threadId.toString(),
-      'page': threadPage.toString(),
-      'PID': postId.toString(),
-    }));
+    final http.Response response = await http.get(Uri.http(
+      'forum.mods.de',
+      'bb/xml/thread.php',
+      {
+        'TID': threadId.toString(),
+        'page': threadPage.toString(),
+        'PID': postId.toString(),
+      },
+    ));
 
     if (response.statusCode == 200) {
       // if the call to the server was successful, parse the XML
@@ -97,9 +109,10 @@ class Thread with TemplateFiller {
 
       if (int.parse(posts.getAttribute('count')) == 0) {
         content.completeError(EmptyThreadPage(
-            threadId: threadId,
-            threadName: threadName,
-            threadPage: threadInfo['threadPage']));
+          threadId: threadId,
+          threadName: threadName,
+          threadPage: threadInfo['threadPage'],
+        ));
         return;
       }
 
@@ -140,9 +153,12 @@ class Thread with TemplateFiller {
           }
 
           avatarSetters.add(
-              avatarLoaders[avatar.text].then((final String avatarBackground) {
-            postInfo['avatarBackground'] = avatarBackground;
-          }));
+            avatarLoaders[avatar.text].then(
+              (final String avatarBackground) {
+                postInfo['avatarBackground'] = avatarBackground;
+              },
+            ),
+          );
         }
 
         // the element 'post' should contain an element 'date'

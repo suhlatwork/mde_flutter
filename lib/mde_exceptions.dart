@@ -5,10 +5,11 @@ class EmptyBoardPage implements Exception {
   final String boardName;
   final int boardPage;
 
-  EmptyBoardPage(
-      {@required this.boardId,
-      @required this.boardName,
-      @required this.boardPage});
+  EmptyBoardPage({
+    @required this.boardId,
+    @required this.boardName,
+    @required this.boardPage,
+  });
 
   @override
   String toString() {
@@ -21,10 +22,11 @@ class EmptyThreadPage implements Exception {
   final String threadName;
   final int threadPage;
 
-  EmptyThreadPage(
-      {@required this.threadId,
-      @required this.threadName,
-      @required this.threadPage});
+  EmptyThreadPage({
+    @required this.threadId,
+    @required this.threadName,
+    @required this.threadPage,
+  });
 
   @override
   String toString() {
@@ -35,8 +37,16 @@ class EmptyThreadPage implements Exception {
 class XmlError implements Exception {
   final String message;
 
-  XmlError.forBoards({@required final String error}) : message = 'Error in XML document for boards: $error';
-  XmlError.forBoard({@required final int boardId, @required final String boardName, @required final int boardPage, @required final String error}) : message = 'Error in XML document for board $boardId ("$boardName") on page $boardPage: $error';
+  XmlError.forBoards({
+    @required final String error,
+  }) : message = 'Error in XML document for boards: $error';
+  XmlError.forBoard({
+    @required final int boardId,
+    @required final String boardName,
+    @required final int boardPage,
+    @required final String error,
+  }) : message =
+            'Error in XML document for board $boardId ("$boardName") on page $boardPage: $error';
 
   @override
   String toString() {

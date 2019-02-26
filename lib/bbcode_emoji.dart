@@ -16,9 +16,12 @@ class BBCodeEmojiParser {
   }
 
   bool parseInTags(final List<String> tags) {
-    return tags.fold(true, (prev, tag) {
-      return prev & (_ignoreTags.indexOf(tag) == -1);
-    });
+    return tags.fold(
+      true,
+      (prev, tag) {
+        return prev & (_ignoreTags.indexOf(tag) == -1);
+      },
+    );
   }
 
   String toHtml(String text) {

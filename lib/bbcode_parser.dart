@@ -59,12 +59,13 @@ class _BBCodeTag {
   final BBCodeTag bbTag;
   final String argument;
 
-  _BBCodeTag(
-      {@required this.closing,
-      @required this.bbTag,
-      @required this.argument,
-      @required this.startIndex,
-      @required this.endIndex});
+  _BBCodeTag({
+    @required this.closing,
+    @required this.bbTag,
+    @required this.argument,
+    @required this.startIndex,
+    @required this.endIndex,
+  });
 }
 
 class BBCodeParser {

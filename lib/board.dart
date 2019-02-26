@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:xml/xml.dart' as xml;
@@ -15,21 +15,31 @@ class Board with TemplateFiller {
   final int boardId;
   final int boardPage;
 
-  Board({@required this.boardId, @required this.boardPage}) {
+  Board({
+    @required this.boardId,
+    @required this.boardPage,
+  }) {
     _fetchBoard();
   }
 
   _fetchBoard() async {
-    debugPrint(Uri.http('forum.mods.de', 'bb/xml/board.php', {
-      'BID': boardId.toString(),
-      'page': boardPage.toString(),
-    }).toString());
+    debugPrint(Uri.http(
+      'forum.mods.de',
+      'bb/xml/board.php',
+      {
+        'BID': boardId.toString(),
+        'page': boardPage.toString(),
+      },
+    ).toString());
 
-    final http.Response response =
-        await http.get(Uri.http('forum.mods.de', 'bb/xml/board.php', {
-      'BID': boardId.toString(),
-      'page': boardPage.toString(),
-    }));
+    final http.Response response = await http.get(Uri.http(
+      'forum.mods.de',
+      'bb/xml/board.php',
+      {
+        'BID': boardId.toString(),
+        'page': boardPage.toString(),
+      },
+    ));
 
     if (response.statusCode == 200) {
       // if the call to the server was successful, parse the XML
@@ -86,9 +96,10 @@ class Board with TemplateFiller {
 
       if (int.parse(threads.getAttribute('count')) == 0) {
         content.completeError(EmptyBoardPage(
-            boardId: boardId,
-            boardName: boardName,
-            boardPage: boardInfo['boardPage']));
+          boardId: boardId,
+          boardName: boardName,
+          boardPage: boardInfo['boardPage'],
+        ));
         return;
       }
 
@@ -219,11 +230,12 @@ class Board with TemplateFiller {
         candidates = lastPostPost.findElements('user');
         if (candidates.length != 1) {
           throw XmlError.forBoard(
-              boardId: boardId,
-              boardName: boardName,
-              boardPage: boardInfo['boardPage'],
-              error:
-                  'A "post" element does not contain exactly one "name" child.');
+            boardId: boardId,
+            boardName: boardName,
+            boardPage: boardInfo['boardPage'],
+            error:
+                'A "post" element does not contain exactly one "name" child.',
+          );
         }
         final String lastPostUser = candidates.first.text;
         threadInfo['lastPostUser'] = lastPostUser;
@@ -231,11 +243,12 @@ class Board with TemplateFiller {
         candidates = lastPostPost.findElements('date');
         if (candidates.length != 1) {
           throw XmlError.forBoard(
-              boardId: boardId,
-              boardName: boardName,
-              boardPage: boardInfo['boardPage'],
-              error:
-                  'A "post" element does not contain exactly one "date" child.');
+            boardId: boardId,
+            boardName: boardName,
+            boardPage: boardInfo['boardPage'],
+            error:
+                'A "post" element does not contain exactly one "date" child.',
+          );
         }
         final DateTime date = DateTime.fromMillisecondsSinceEpoch(
             int.parse(candidates.first.getAttribute('timestamp')) * 1000);

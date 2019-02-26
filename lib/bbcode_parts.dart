@@ -10,17 +10,22 @@ class BBCodePart<T extends BBCodeTag> {
 
   BBCodePart deepCopy() {
     BBCodePart copy = BBCodePart(tag, List<BBCodePart>(), argument);
-    parts.forEach((element) {
-      copy.parts.add(element.deepCopy());
-    });
+    parts.forEach(
+      (element) {
+        copy.parts.add(element.deepCopy());
+      },
+    );
     return copy;
   }
 
   String toHtml() {
     return tag.toHtml(
-        parts.fold('', (prev, element) {
-          return prev + element.toHtml();
-        }),
+        parts.fold(
+          '',
+          (prev, element) {
+            return prev + element.toHtml();
+          },
+        ),
         argument);
   }
 }
@@ -53,9 +58,11 @@ class BBCodeDocument extends BBCodePart {
   BBCodeDocument deepCopy() {
     BBCodeDocument copy = BBCodeDocument(List<BBCodePart>(),
         htmlPostProcessor: htmlPostProcessor);
-    parts.forEach((element) {
-      copy.parts.add(element.deepCopy());
-    });
+    parts.forEach(
+      (element) {
+        copy.parts.add(element.deepCopy());
+      },
+    );
     return copy;
   }
 
@@ -64,13 +71,19 @@ class BBCodeDocument extends BBCodePart {
     if (htmlPostProcessor != null) {
       BBCodeDocument document = this.deepCopy();
       htmlPostProcessor(document);
-      return document.parts.fold('', (prev, element) {
-        return prev + element.toHtml();
-      });
+      return document.parts.fold(
+        '',
+        (prev, element) {
+          return prev + element.toHtml();
+        },
+      );
     }
 
-    return parts.fold('', (prev, element) {
-      return prev + element.toHtml();
-    });
+    return parts.fold(
+      '',
+      (prev, element) {
+        return prev + element.toHtml();
+      },
+    );
   }
 }
