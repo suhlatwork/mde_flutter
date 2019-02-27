@@ -21,7 +21,9 @@ class _MainViewerState extends State<MainViewer> with WidgetsBindingObserver {
 
   _MainViewerState()
       : _controllerCompleter = Completer<WebViewController>(),
-        _appBarTitle = '';
+        _appBarTitle = '' {
+    HttpServerWrapper.start();
+  }
 
   @override
   Widget build(BuildContext context) {
