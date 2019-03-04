@@ -11,9 +11,11 @@ class MDEBenderCache {
 
   Future<String> html(final String avatar) async {
     final String cleanUri = url.normalize(avatar);
-    final String localUri = url.normalize(url.joinAll(['/bender', cleanUri]));
 
     if (await _check(cleanUri)) {
+      final String localUri = Uri(
+        path: url.normalize(url.joinAll(['/bender', cleanUri])),
+      ).path;
       return 'style="background-image:url($localUri)"';
     }
 
