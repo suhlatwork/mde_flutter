@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'http_server.dart';
+import 'main_drawer.dart';
 import 'mde_account.dart';
 import 'password_dialog.dart';
 
@@ -37,7 +38,7 @@ class _MainViewerState extends State<MainViewer> with WidgetsBindingObserver {
           child: FutureBuilder(
             future: HttpServerWrapper.port.future,
             builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.hasData) {
+              if (snapshot.connectionState == ConnectionState.done) {
                 return WebView(
                   // TODO: remove after https://github.com/flutter/flutter/issues/24585
                   gestureRecognizers:
@@ -90,14 +91,32 @@ class _MainViewerState extends State<MainViewer> with WidgetsBindingObserver {
             },
           ),
           onWillPop: () async {
+            // peek at the current route and see whether a pop would be handled
+            // internally, i.e., whether a drawer would be closed, ...
+            bool handlePopInternally = false;
+            Navigator.of(context).popUntil(
+              (Route route) {
+                if (route.willHandlePopInternally) {
+                  handlePopInternally = true;
+                }
+                return true;
+              },
+            );
+            if (handlePopInternally) {
+              return true;
+            }
+
+            // else go back in web view
             if (await (await _controllerCompleter.future).canGoBack()) {
               (await _controllerCompleter.future).goBack();
               return false;
             }
+
             return true;
           },
         ),
       ),
+      drawer: new MainDrawer(controllerCompleter: _controllerCompleter),
     );
   }
 

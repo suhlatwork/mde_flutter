@@ -54,21 +54,6 @@ $(document).ready(function() {
 
         openUrl(url.toString());
     });
-
-    // floating action button menu
-    $('button.menu-item-refresh').on('click', function() {
-        location.reload();
-        return false;
-    });
-
-    $('button.menu-item-back').on('click', function() {
-        window.history.back();
-        return false;
-    });
-
-    $('button.menu').on('click', function() {
-        $('button.menu-item').toggleClass('menu-item-hidden');
-    });
 });
 
 function openUrl(url) {

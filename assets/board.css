@@ -75,36 +75,3 @@ body {
     width: 100%;
     color: rgba(255, 255, 255, 0.4);
 }
-
-.fab-menu {
-    bottom: 15px;
-    position: fixed;
-    right: 15px;
-}
-
-.fab-menu button {
-    background-color: #ff0000;
-    border: 0;
-    border-radius: 100%;
-    box-shadow: 0 3px 6px;  // 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-    display: block;
-    height: 55px;
-    outline: none;
-    width: 55px;
-}
-
-.fab-menu .menu {
-    margin: 10px 0 0 0;
-}
-
-.fab-menu .menu-item {
-    margin: 0 0 5px 0;
-}
-
-.fab-menu .menu-item-hidden {
-    display: none;
-}
-
-.fab-menu .button .material-icons {
-    vertical-align: text-bottom;
-}
