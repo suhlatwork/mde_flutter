@@ -3,6 +3,9 @@ function onPageShow() {
 }
 
 $(document).ready(function() {
+    // check current user id
+    checkUserId.postMessage(currentUserId);
+
     $('div.thread, div.thread-special').on('click', function() {
         var params = new URLSearchParams();
         params.set('TID', $(this).attr('data-thread-id'));

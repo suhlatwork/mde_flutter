@@ -8,11 +8,12 @@
     <link href="/assets/material-icons.css" type="text/css" rel="stylesheet">
     <link href="/assets/thread.css" type="text/css" rel="stylesheet">
 
-    {{#initialAnchor}}
     <script type="text/javascript">
+        {{#initialAnchor}}
         var initialAnchor = '{{initialPostId}}';
+        {{/initialAnchor}}
+        var currentUserId = {{currentUserId}};
     </script>
-    {{/initialAnchor}}
 </head>
 <body onpageshow="onPageShow()">
 <div class="thread"

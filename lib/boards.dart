@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xml/xml.dart' as xml;
 
 import 'mde_exceptions.dart';
@@ -20,6 +21,9 @@ class Boards with TemplateFiller {
       'bb/xml/boards.php',
     ).toString());
 
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final String sessionCookie = sharedPreferences.getString('sessioncookie');
+
     HttpClient httpClient = HttpClient();
     HttpClientRequest request = await httpClient.getUrl(
       Uri.http(
@@ -27,9 +31,22 @@ class Boards with TemplateFiller {
         'bb/xml/boards.php',
       ),
     );
+    if (sessionCookie != null) {
+      request.cookies.add(Cookie.fromSetCookieValue(sessionCookie));
+    }
     HttpClientResponse response = await request.close();
 
     if (response.statusCode == 200) {
+      // update session cookie
+      if (sessionCookie != null) {
+        // keep the last cookie for MDESID
+        Cookie cookie = response.cookies.lastWhere((Cookie cookie) {
+          return cookie.name == 'MDESID';
+        });
+
+        await sharedPreferences.setString('sessioncookie', cookie.toString());
+      }
+
       // if the call to the server was successful, parse the XML
       // the mods.de server encodes the XML document in UTF-8, but does not
       // specify this in the HTTP header so that the http package uses latin1 for
@@ -49,6 +66,10 @@ class Boards with TemplateFiller {
           error: 'Root element needs to be "categories".',
         );
       }
+
+      boardsInfo['currentUserId'] =
+          int.parse(categories.getAttribute('current-user-id'));
+      boardsInfo['isLoggedIn'] = boardsInfo['currentUserId'] != 0;
 
       // the element 'categories' should contain an attribute 'count' which should
       // be convertible to an integer, and should agree with the number of

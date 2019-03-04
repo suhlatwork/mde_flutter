@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xml/xml.dart' as xml;
 
 import 'mde_bbcode_parser.dart';
@@ -41,6 +42,9 @@ class Thread with TemplateFiller {
       },
     ).toString());
 
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final String sessionCookie = sharedPreferences.getString('sessioncookie');
+
     HttpClient httpClient = HttpClient();
     HttpClientRequest request = await httpClient.getUrl(Uri.http(
       'forum.mods.de',
@@ -51,9 +55,22 @@ class Thread with TemplateFiller {
         'PID': postId.toString(),
       },
     ));
+    if (sessionCookie != null) {
+      request.cookies.add(Cookie.fromSetCookieValue(sessionCookie));
+    }
     HttpClientResponse response = await request.close();
 
     if (response.statusCode == 200) {
+      // update session cookie
+      if (sessionCookie != null) {
+        // keep the last cookie for MDESID
+        Cookie cookie = response.cookies.lastWhere((Cookie cookie) {
+          return cookie.name == 'MDESID';
+        });
+
+        await sharedPreferences.setString('sessioncookie', cookie.toString());
+      }
+
       // if the call to the server was successful, parse the XML
       // the mods.de server encodes the XML document in UTF-8, but does not
       // specify this in the HTTP header so that the http package uses latin1 for
@@ -74,6 +91,10 @@ class Thread with TemplateFiller {
       if (thread.name.qualified != 'thread') {
         throw Exception('Unexpected content!');
       }
+
+      threadInfo['currentUserId'] =
+          int.parse(thread.getAttribute('current-user-id'));
+      threadInfo['isLoggedIn'] = threadInfo['currentUserId'] != 0;
 
       threadInfo['id'] = int.parse(thread.getAttribute('id'));
 
@@ -244,7 +265,6 @@ class Thread with TemplateFiller {
         }
 
         postInfo['isAuthor'] = false;
-        postInfo['isLoggedIn'] = false;
         postInfo['getAuthorLocked'] = false;
 
         List posts = threadInfo['posts'];

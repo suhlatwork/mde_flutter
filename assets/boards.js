@@ -3,6 +3,9 @@ function onPageShow() {
 }
 
 $(document).ready(function() {
+    // check current user id
+    checkUserId.postMessage(currentUserId);
+
     $('div.category.category').on('click', function() {
         $(this).parent().children('div.board').toggle();
         return false;

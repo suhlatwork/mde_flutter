@@ -7,6 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'http_server.dart';
+import 'mde_account.dart';
+import 'password_dialog.dart';
 
 class MainViewer extends StatefulWidget {
   @override
@@ -56,6 +58,12 @@ class _MainViewerState extends State<MainViewer> with WidgetsBindingObserver {
                       name: 'appBarTitleSetter',
                       onMessageReceived: (final JavascriptMessage message) {
                         _handleAppBarTitleSetter(message.message);
+                      },
+                    ),
+                    JavascriptChannel(
+                      name: 'checkUserId',
+                      onMessageReceived: (final JavascriptMessage message) {
+                        _handleCheckUserId(context, message.message);
                       },
                     ),
                     JavascriptChannel(
@@ -122,9 +130,71 @@ class _MainViewerState extends State<MainViewer> with WidgetsBindingObserver {
     });
   }
 
+  _handleCheckUserId(BuildContext context, final String message) async {
+    final int currentUserId = int.parse(message);
+
+    final bool preferencesShowLoginDialog = await MDEAccount.showLoginDialog();
+    final int preferencesUserId = await MDEAccount.userId();
+
+    bool showLoginDialog =
+        ((currentUserId == 0) && preferencesShowLoginDialog) ||
+            (preferencesUserId == null && preferencesShowLoginDialog) ||
+            (preferencesUserId != null && preferencesUserId != currentUserId);
+
+    if (showLoginDialog) {
+      List<String> loginInformation = await showDialog(
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return PasswordDialog();
+        },
+        context: context,
+      );
+
+      if (loginInformation != null) {
+        bool success = await MDEAccount.login(
+          username: loginInformation[0],
+          password: loginInformation[1],
+        );
+
+        if (success) {
+          Scaffold.of(context).removeCurrentSnackBar();
+          Scaffold.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Benutzer "${loginInformation[0]}" erfolgreich eingeloggt.',
+              ),
+            ),
+          );
+          await (await _controllerCompleter.future).reload();
+        } else {
+          Scaffold.of(context).removeCurrentSnackBar();
+          Scaffold.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Benutzer "${loginInformation[0]}" konnte nicht eingeloggt werden.',
+              ),
+            ),
+          );
+        }
+      } else {
+        await MDEAccount.clearLoginInformation(
+          nextLoginDialog: Duration(
+            hours: 24,
+          ),
+        );
+      }
+    }
+  }
+
   _handleErrorDisplay(BuildContext context, final String message) async {
     Scaffold.of(context).removeCurrentSnackBar();
-    Scaffold.of(context).showSnackBar(SnackBar(content: Text(message)));
+    Scaffold.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+        ),
+      ),
+    );
     if (await (await _controllerCompleter.future).canGoBack()) {
       (await _controllerCompleter.future).goBack();
     }

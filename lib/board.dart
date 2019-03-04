@@ -2,8 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
-import 'package:xml/xml.dart' as xml;
 import 'package:reflected_mustache/mustache.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:xml/xml.dart' as xml;
 
 import 'mde_exceptions.dart';
 import 'mde_icons.dart';
@@ -32,6 +33,9 @@ class Board with TemplateFiller {
       },
     ).toString());
 
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final String sessionCookie = sharedPreferences.getString('sessioncookie');
+
     HttpClient httpClient = HttpClient();
     HttpClientRequest request = await httpClient.getUrl(Uri.http(
       'forum.mods.de',
@@ -41,9 +45,22 @@ class Board with TemplateFiller {
         'page': boardPage.toString(),
       },
     ));
+    if (sessionCookie != null) {
+      request.cookies.add(Cookie.fromSetCookieValue(sessionCookie));
+    }
     HttpClientResponse response = await request.close();
 
     if (response.statusCode == 200) {
+      // update session cookie
+      if (sessionCookie != null) {
+        // keep the last cookie for MDESID
+        Cookie cookie = response.cookies.lastWhere((Cookie cookie) {
+          return cookie.name == 'MDESID';
+        });
+
+        await sharedPreferences.setString('sessioncookie', cookie.toString());
+      }
+
       // if the call to the server was successful, parse the XML
       // the mods.de server encodes the XML document in UTF-8, but does not
       // specify this in the HTTP header so that the http package uses latin1 for
@@ -78,6 +95,10 @@ class Board with TemplateFiller {
       if (board.name.qualified != 'board') {
         throw Exception('Unexpected content!');
       }
+
+      boardInfo['currentUserId'] =
+          int.parse(board.getAttribute('current-user-id'));
+      boardInfo['isLoggedIn'] = boardInfo['currentUserId'] != 0;
 
       // the element 'board' should contain an element 'name'
       var candidates = board.findElements('name');

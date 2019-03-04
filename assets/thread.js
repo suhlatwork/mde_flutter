@@ -3,6 +3,9 @@ function onPageShow() {
 }
 
 $(document).ready(function() {
+    // check current user id
+    checkUserId.postMessage(currentUserId);
+
     // jump to post requested by the PID argument
     if (typeof initialAnchor !== 'undefined' && initialAnchor !== null) {
         var anchor = $('a[name="' + initialAnchor + '"]');
