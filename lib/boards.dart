@@ -1,6 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:xml/xml.dart' as xml;
 
@@ -20,10 +20,14 @@ class Boards with TemplateFiller {
       'bb/xml/boards.php',
     ).toString());
 
-    final http.Response response = await http.get(Uri.http(
-      'forum.mods.de',
-      'bb/xml/boards.php',
-    ));
+    HttpClient httpClient = HttpClient();
+    HttpClientRequest request = await httpClient.getUrl(
+      Uri.http(
+        'forum.mods.de',
+        'bb/xml/boards.php',
+      ),
+    );
+    HttpClientResponse response = await request.close();
 
     if (response.statusCode == 200) {
       // if the call to the server was successful, parse the XML
@@ -32,7 +36,7 @@ class Boards with TemplateFiller {
       // the decoding causing trouble with umlauts
       // the XML document currently specifies UTF-8 so this is hard-coded here
       final xml.XmlDocument document =
-          xml.parse(utf8.decode(response.bodyBytes));
+          xml.parse(await response.transform(utf8.decoder).join());
 
       Map<String, Object> boardsInfo = {
         'categories': [],
@@ -166,6 +170,8 @@ class Boards with TemplateFiller {
 
       content.complete(boardsInfo);
     } else {
+      response.drain();
+
       // If that call was not successful, throw an error.
       throw Exception('Failed to load post');
     }

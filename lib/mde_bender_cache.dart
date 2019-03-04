@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 
@@ -49,12 +48,21 @@ class MDEBenderCache {
       'forum.mods.de',
       url.join('bb', cleanUri),
     ).toString());
-    http.Response response = await http.get(Uri.http(
+
+    HttpClient httpClient = HttpClient();
+    HttpClientRequest request = await httpClient.getUrl(Uri.http(
       'forum.mods.de',
       url.join('bb', cleanUri),
     ));
+    HttpClientResponse response = await request.close();
 
-    await File(fullPath).writeAsBytes(response.bodyBytes);
+    await File(fullPath).writeAsBytes(
+      await response.reduce(
+        (List<int> first, List<int> second) {
+          return first + second;
+        },
+      ),
+    );
 
     return true;
   }
