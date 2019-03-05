@@ -14,8 +14,7 @@ class MDEAccount {
     @required final int postId,
     @required final String setBookmarkToken,
   }) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    final String sessionCookie = sharedPreferences.getString('sessioncookie');
+    final Cookie sessionCookie = await MDEAccount.sessionCookie();
 
     HttpClient httpClient = HttpClient();
     HttpClientRequest request = await httpClient.getUrl(Uri.http(
@@ -27,7 +26,7 @@ class MDEAccount {
       },
     ));
     if (sessionCookie != null) {
-      request.cookies.add(Cookie.fromSetCookieValue(sessionCookie));
+      request.cookies.add(sessionCookie);
     }
     HttpClientResponse response = await request.close();
 
@@ -39,7 +38,7 @@ class MDEAccount {
           return cookie.name == 'MDESID';
         });
 
-        await sharedPreferences.setString('sessioncookie', cookie.toString());
+        await MDEAccount.updateSessionCookie(cookie);
       }
 
       final String reply = await response.transform(utf8.decoder).join();
@@ -185,12 +184,57 @@ class MDEAccount {
     return false;
   }
 
+  static Future<bool> loginDialog(BuildContext context) async {
+    List<String> loginInformation = await showDialog(
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return PasswordDialog();
+      },
+      context: context,
+    );
+
+    if (loginInformation != null) {
+      bool success = await MDEAccount.login(
+        username: loginInformation[0],
+        password: loginInformation[1],
+      );
+
+      if (success) {
+        Scaffold.of(context).removeCurrentSnackBar();
+        Scaffold.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Benutzer "${loginInformation[0]}" erfolgreich eingeloggt.',
+            ),
+          ),
+        );
+        return true;
+      } else {
+        Scaffold.of(context).removeCurrentSnackBar();
+        Scaffold.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Benutzer "${loginInformation[0]}" konnte nicht eingeloggt werden.',
+            ),
+          ),
+        );
+      }
+    } else {
+      await MDEAccount.clearLoginInformation(
+        nextLoginDialog: Duration(
+          hours: 24,
+        ),
+      );
+    }
+
+    return false;
+  }
+
   static removeBookmark({
     @required final int bookmarkId,
     @required final String removeBookmarkToken,
   }) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    final String sessionCookie = sharedPreferences.getString('sessioncookie');
+    final Cookie sessionCookie = await MDEAccount.sessionCookie();
 
     HttpClient httpClient = HttpClient();
     HttpClientRequest request = await httpClient.getUrl(Uri.http(
@@ -202,7 +246,7 @@ class MDEAccount {
       },
     ));
     if (sessionCookie != null) {
-      request.cookies.add(Cookie.fromSetCookieValue(sessionCookie));
+      request.cookies.add(sessionCookie);
     }
     HttpClientResponse response = await request.close();
 
@@ -214,7 +258,7 @@ class MDEAccount {
           return cookie.name == 'MDESID';
         });
 
-        await sharedPreferences.setString('sessioncookie', cookie.toString());
+        await MDEAccount.updateSessionCookie(cookie);
       }
 
       final String reply = await response.transform(utf8.decoder).join();
@@ -230,6 +274,15 @@ class MDEAccount {
     throw UnspecificBookmarkError();
   }
 
+  static Future<Cookie> sessionCookie() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final String sessionCookieString = sharedPreferences.getString('sessioncookie');
+    if (sessionCookieString == null) {
+      return null;
+    }
+    return Cookie.fromSetCookieValue(sessionCookieString);
+  }
+
   static Future<bool> showLoginDialog() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     final String timestamp = sharedPreferences.getString('next-login-dialog');
@@ -243,6 +296,11 @@ class MDEAccount {
     }
 
     return false;
+  }
+
+  static updateSessionCookie(final Cookie sessionCookie) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.setString('sessioncookie', sessionCookie.toString());
   }
 
   static Future<int> userId() async {

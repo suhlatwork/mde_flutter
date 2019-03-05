@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xml/xml.dart' as xml;
 
+import 'mde_account.dart';
 import 'mde_bbcode_parser.dart';
 import 'mde_bender_cache.dart';
 import 'mde_exceptions.dart';
@@ -43,8 +43,7 @@ class Thread with TemplateFiller {
       },
     ).toString());
 
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    final String sessionCookie = sharedPreferences.getString('sessioncookie');
+    final Cookie sessionCookie = await MDEAccount.sessionCookie();
 
     HttpClient httpClient = HttpClient();
     HttpClientRequest request = await httpClient.getUrl(Uri.http(
@@ -58,7 +57,7 @@ class Thread with TemplateFiller {
       },
     ));
     if (sessionCookie != null) {
-      request.cookies.add(Cookie.fromSetCookieValue(sessionCookie));
+      request.cookies.add(sessionCookie);
     }
     HttpClientResponse response = await request.close();
 
@@ -70,7 +69,7 @@ class Thread with TemplateFiller {
           return cookie.name == 'MDESID';
         });
 
-        await sharedPreferences.setString('sessioncookie', cookie.toString());
+        await MDEAccount.updateSessionCookie(cookie);
       }
 
       // if the call to the server was successful, parse the XML

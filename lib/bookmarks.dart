@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xml/xml.dart' as xml;
 
+import 'mde_account.dart';
 import 'mde_exceptions.dart';
 
 class _XmlTrimmer extends xml.XmlVisitor {
@@ -63,8 +63,7 @@ class Bookmarks {
       'bb/xml/bookmarks.php',
     ).toString());
 
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    final String sessionCookie = sharedPreferences.getString('sessioncookie');
+    final Cookie sessionCookie = await MDEAccount.sessionCookie();
 
     // if no user is logged in, leave early
     if (sessionCookie == null) {
@@ -79,7 +78,9 @@ class Bookmarks {
         'bb/xml/bookmarks.php',
       ),
     );
-    request.cookies.add(Cookie.fromSetCookieValue(sessionCookie));
+    if (sessionCookie != null) {
+      request.cookies.add(sessionCookie);
+    }
     HttpClientResponse response = await request.close();
 
     if (response.statusCode == 200) {
@@ -90,7 +91,7 @@ class Bookmarks {
           return cookie.name == 'MDESID';
         });
 
-        await sharedPreferences.setString('sessioncookie', cookie.toString());
+        await MDEAccount.updateSessionCookie(cookie);
       }
 
       // if the call to the server was successful, parse the XML
