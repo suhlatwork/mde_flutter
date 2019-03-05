@@ -5,6 +5,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import 'bookmarks.dart';
 import 'http_server.dart';
+import 'mde_account.dart';
 
 class MainDrawer extends StatefulWidget {
   final Completer<WebViewController> controllerCompleter;
@@ -104,7 +105,41 @@ class _MainDrawerState extends State<MainDrawer> {
                   return item.unreadPosts != 0;
                 }).map<Widget>((BookmarkItem item) {
                   return ListTile(
-                      onLongPress: () {},
+                      onLongPress: () async {
+                        final bool remove = await showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Lesezeichen entfernen'),
+                              content: Text('Soll das Lesezeichen für den Thread "${item.threadTitle}" wirklich entfernt werden?'),
+                              actions: <Widget>[
+                                FlatButton(
+                                  child: Text('Behalten'),
+                                  onPressed: () {
+                                    Navigator.pop(context, false);
+                                  },
+                                ),
+                                FlatButton(
+                                  child: Text('Entfernen'),
+                                  onPressed: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+
+                        if (remove ?? false) {
+                          await MDEAccount.removeBookmark(
+                            bookmarkId: item.bookmarkId,
+                            removeBookmarkToken: item.removeBookmarkToken,
+                          );
+                          // update bookmark list
+                          setState(() {});
+                        }
+                      },
                       onTap: () async {
                         final Uri uri = Uri.http('', '').replace(
                           host: InternetAddress.loopbackIPv6.host,

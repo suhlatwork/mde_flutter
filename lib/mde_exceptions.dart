@@ -44,7 +44,7 @@ class TooManyBookmarks implements Exception {
 class UnspecificBookmarkError implements Exception {
   @override
   String toString() {
-    return 'Could not add a new bookmark, received unspecific error from server.';
+    return 'Could not add or remove bookmark, received unspecific error from server.';
   }
 }
 

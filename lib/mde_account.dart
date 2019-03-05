@@ -185,6 +185,51 @@ class MDEAccount {
     return false;
   }
 
+  static removeBookmark({
+    @required final int bookmarkId,
+    @required final String removeBookmarkToken,
+  }) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final String sessionCookie = sharedPreferences.getString('sessioncookie');
+
+    HttpClient httpClient = HttpClient();
+    HttpClientRequest request = await httpClient.getUrl(Uri.http(
+      'forum.mods.de',
+      'bb/async/remove-bookmark.php',
+      {
+        'BMID': bookmarkId.toString(),
+        'token': removeBookmarkToken,
+      },
+    ));
+    if (sessionCookie != null) {
+      request.cookies.add(Cookie.fromSetCookieValue(sessionCookie));
+    }
+    HttpClientResponse response = await request.close();
+
+    if (response.statusCode == 200) {
+      // update session cookie
+      if (sessionCookie != null) {
+        // keep the last cookie for MDESID
+        Cookie cookie = response.cookies.lastWhere((Cookie cookie) {
+          return cookie.name == 'MDESID';
+        });
+
+        await sharedPreferences.setString('sessioncookie', cookie.toString());
+      }
+
+      final String reply = await response.transform(utf8.decoder).join();
+      final int result = int.parse(reply.split(RegExp(r'\s'))[0]);
+      if (result == 1) {
+        // success
+        return;
+      }
+    } else {
+      response.drain();
+    }
+
+    throw UnspecificBookmarkError();
+  }
+
   static Future<bool> showLoginDialog() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     final String timestamp = sharedPreferences.getString('next-login-dialog');

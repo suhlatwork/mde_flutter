@@ -30,14 +30,18 @@ class _XmlTrimmer extends xml.XmlVisitor {
 }
 
 class BookmarkItem {
+  final int bookmarkId;
   final int postId;
+  final String removeBookmarkToken;
   final bool threadClosed;
   final int threadId;
   final String threadTitle;
   final int unreadPosts;
 
   BookmarkItem({
+    @required this.bookmarkId,
     @required this.postId,
+    @required this.removeBookmarkToken,
     @required this.threadClosed,
     @required this.threadId,
     @required this.threadTitle,
@@ -130,6 +134,7 @@ class Bookmarks {
           );
         }
 
+        final int bookmarkId = int.parse(bookmark.getAttribute('BMID'));
         final int newPosts = int.parse(bookmark.getAttribute('newposts'));
         final int postId = int.parse(bookmark.getAttribute('PID'));
 
@@ -143,9 +148,17 @@ class Bookmarks {
         final bool threadClosed =
             int.parse(candidates.first.getAttribute('closed')) != 0;
 
+        candidates = bookmark.findElements('token-removebookmark');
+        if (candidates.length != 1) {
+          throw Exception('token-removebookmark element missing from bookmark!');
+        }
+        final String removeBookmarkToken = candidates.first.getAttribute('value');
+
         bookmarkList.add(
           BookmarkItem(
+            bookmarkId: bookmarkId,
             postId: postId,
+            removeBookmarkToken: removeBookmarkToken,
             threadClosed: threadClosed,
             threadTitle: threadName,
             threadId: threadId,
