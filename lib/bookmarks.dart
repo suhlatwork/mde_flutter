@@ -107,6 +107,15 @@ class Bookmarks {
       // ..., and remove empty text nodes
       document.normalize();
 
+      // if not logged in, the rootElement is not 'bookmarks'
+      if (document.rootElement.name.qualified == 'not-logged-in') {
+        // outdated login information are stored somewhere
+        MDEAccount.clearLoginInformation();
+
+        bookmarkListCompleter.complete([]);
+        return;
+      }
+
       // the XML document should only contain one rootElement 'bookmarks'
       final xml.XmlElement bookmarks = document.rootElement;
       if (bookmarks.name.qualified != 'bookmarks') {
