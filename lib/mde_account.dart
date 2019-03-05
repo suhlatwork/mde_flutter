@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
-import 'package:html/dom.dart';
+import 'package:flutter/material.dart';
+import 'package:html/dom.dart' as html;
 import 'package:html/parser.dart' show parse;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'mde_exceptions.dart';
+import 'password_dialog.dart';
 
 class MDEAccount {
   MDEAccount._();
@@ -114,7 +115,7 @@ class MDEAccount {
     HttpClientResponse response = await request.close();
 
     if (response.statusCode == 200) {
-      final Document document =
+      final html.Document document =
           parse(await response.transform(utf8.decoder).join());
       final bool success =
           document.getElementsByClassName('box success').length == 1;
@@ -127,9 +128,10 @@ class MDEAccount {
       }
 
       if (success) {
-        final Element div = document.getElementsByClassName('box success')[0];
+        final html.Element div =
+            document.getElementsByClassName('box success')[0];
 
-        final Element iframe = div.getElementsByTagName('iframe')[0];
+        final html.Element iframe = div.getElementsByTagName('iframe')[0];
         final String src = iframe.attributes['src'];
 
         final Uri uri = Uri.parse(src);
@@ -230,6 +232,80 @@ class MDEAccount {
     return false;
   }
 
+  static Future<bool> logout() async {
+    // get logout token
+    final Cookie sessionCookie = await MDEAccount.sessionCookie();
+
+    HttpClient httpClient = HttpClient();
+    HttpClientRequest request = await httpClient.getUrl(
+      Uri.http(
+        'forum.mods.de',
+        'bb/index.php',
+      ),
+    );
+    if (sessionCookie != null) {
+      request.cookies.add(sessionCookie);
+    }
+    HttpClientResponse response = await request.close();
+
+    if (response.statusCode == 200) {
+      // if the call to the server was successful, parse the HTML
+      final html.Document document =
+          parse(await response.transform(latin1.decoder).join());
+
+      final Uri logoutUrl = Uri.parse(
+          document.querySelectorAll('a').firstWhere((html.Element element) {
+        if (!element.attributes.containsKey('href')) {
+          return false;
+        }
+
+        if (!element.attributes['href']
+            .startsWith('http://login.mods.de/logout/')) {
+          return false;
+        }
+
+        return true;
+      }).attributes['href']);
+
+      // TODO test that UID is equal to the stored user id
+
+      HttpClient logoutHttpClient = HttpClient();
+      HttpClientRequest logoutRequest = await logoutHttpClient.getUrl(
+        Uri.http(
+          'login.mods.de',
+          '/logout/',
+          {
+            'UID': (await MDEAccount.userId()).toString(),
+            'a': logoutUrl.queryParameters['a'],
+          },
+        ),
+      );
+      HttpClientResponse logoutResponse = await logoutRequest.close();
+
+      if (logoutResponse.statusCode == 200) {
+        final html.Document logoutDocument =
+            parse(await logoutResponse.transform(latin1.decoder).join());
+
+        final bool success =
+            logoutDocument.getElementsByClassName('box success').length == 1;
+
+        if (success) {
+          MDEAccount.clearLoginInformation();
+          return true;
+        }
+      } else {
+        logoutResponse.drain();
+      }
+    } else {
+      response.drain();
+    }
+
+    // finally clear settings from preferences
+    MDEAccount.clearLoginInformation();
+    // session on server could not be destroyed
+    return false;
+  }
+
   static removeBookmark({
     @required final int bookmarkId,
     @required final String removeBookmarkToken,
@@ -276,7 +352,8 @@ class MDEAccount {
 
   static Future<Cookie> sessionCookie() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    final String sessionCookieString = sharedPreferences.getString('sessioncookie');
+    final String sessionCookieString =
+        sharedPreferences.getString('sessioncookie');
     if (sessionCookieString == null) {
       return null;
     }
@@ -300,7 +377,8 @@ class MDEAccount {
 
   static updateSessionCookie(final Cookie sessionCookie) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    await sharedPreferences.setString('sessioncookie', sessionCookie.toString());
+    await sharedPreferences.setString(
+        'sessioncookie', sessionCookie.toString());
   }
 
   static Future<int> userId() async {

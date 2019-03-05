@@ -95,6 +95,60 @@ class _MainDrawerState extends State<MainDrawer> {
                 ],
               ),
             ),
+            Divider(),
+            FutureBuilder(
+              future: MDEAccount.userName(),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.data != null) {
+                    return ListTile(
+                      leading: Icon(Icons.account_circle),
+                      onTap: () async {
+                        bool success = await MDEAccount.logout();
+
+                        Navigator.pop(context);
+
+                        Scaffold.of(context).removeCurrentSnackBar();
+                        if (success) {
+                          Scaffold.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Benutzer "${snapshot.data}" erfolgreich abgemeldet.',
+                              ),
+                            ),
+                          );
+                        } else {
+                          Scaffold.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Lokale Sitzungsdaten für Benutzer "${snapshot.data}" gelöscht, Sitzungsdaten auf den mods.de Servern konnten nicht gelöscht werden.',
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      title: Text('${snapshot.data} abmelden'),
+                    );
+                  }
+
+                  return ListTile(
+                    leading: Icon(Icons.account_circle),
+                    onTap: () async {
+                      if (await MDEAccount.loginDialog(context)) {
+                        await (await widget.controllerCompleter.future)
+                            .reload();
+                      }
+                      Navigator.pop(context);
+                    },
+                    title: Text('Benutzer anmelden'),
+                  );
+                }
+
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
+            ),
           ];
 
           if (snapshot.connectionState == ConnectionState.done) {
@@ -112,7 +166,8 @@ class _MainDrawerState extends State<MainDrawer> {
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: Text('Lesezeichen entfernen'),
-                              content: Text('Soll das Lesezeichen für den Thread "${item.threadTitle}" wirklich entfernt werden?'),
+                              content: Text(
+                                  'Soll das Lesezeichen für den Thread "${item.threadTitle}" wirklich entfernt werden?'),
                               actions: <Widget>[
                                 FlatButton(
                                   child: Text('Behalten'),

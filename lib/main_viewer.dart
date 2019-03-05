@@ -11,7 +11,6 @@ import 'http_server.dart';
 import 'main_drawer.dart';
 import 'mde_account.dart';
 import 'mde_exceptions.dart';
-import 'password_dialog.dart';
 
 class MainViewer extends StatefulWidget {
   @override
@@ -169,46 +168,8 @@ class _MainViewerState extends State<MainViewer> with WidgetsBindingObserver {
             (preferencesUserId != null && preferencesUserId != currentUserId);
 
     if (showLoginDialog) {
-      List<String> loginInformation = await showDialog(
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return PasswordDialog();
-        },
-        context: context,
-      );
-
-      if (loginInformation != null) {
-        bool success = await MDEAccount.login(
-          username: loginInformation[0],
-          password: loginInformation[1],
-        );
-
-        if (success) {
-          Scaffold.of(context).removeCurrentSnackBar();
-          Scaffold.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Benutzer "${loginInformation[0]}" erfolgreich eingeloggt.',
-              ),
-            ),
-          );
-          await (await _controllerCompleter.future).reload();
-        } else {
-          Scaffold.of(context).removeCurrentSnackBar();
-          Scaffold.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Benutzer "${loginInformation[0]}" konnte nicht eingeloggt werden.',
-              ),
-            ),
-          );
-        }
-      } else {
-        await MDEAccount.clearLoginInformation(
-          nextLoginDialog: Duration(
-            hours: 24,
-          ),
-        );
+      if (await MDEAccount.loginDialog(context)) {
+        await (await _controllerCompleter.future).reload();
       }
     }
   }

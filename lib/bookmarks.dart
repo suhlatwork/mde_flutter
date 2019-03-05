@@ -160,9 +160,11 @@ class Bookmarks {
 
         candidates = bookmark.findElements('token-removebookmark');
         if (candidates.length != 1) {
-          throw Exception('token-removebookmark element missing from bookmark!');
+          throw Exception(
+              'token-removebookmark element missing from bookmark!');
         }
-        final String removeBookmarkToken = candidates.first.getAttribute('value');
+        final String removeBookmarkToken =
+            candidates.first.getAttribute('value');
 
         bookmarkList.add(
           BookmarkItem(
