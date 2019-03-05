@@ -47,6 +47,9 @@ class XmlError implements Exception {
     @required final String error,
   }) : message =
             'Error in XML document for board $boardId ("$boardName") on page $boardPage: $error';
+  XmlError.forBookmarks({
+    @required final String error,
+  }) : message = 'Error in XML document for bookmarks: $error';
 
   @override
   String toString() {

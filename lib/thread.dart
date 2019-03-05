@@ -39,6 +39,7 @@ class Thread with TemplateFiller {
         'TID': threadId.toString(),
         'page': threadPage.toString(),
         'PID': postId.toString(),
+        'update_bookmark': 1.toString(),
       },
     ).toString());
 
@@ -53,6 +54,7 @@ class Thread with TemplateFiller {
         'TID': threadId.toString(),
         'page': threadPage.toString(),
         'PID': postId.toString(),
+        'update_bookmark': 1.toString(),
       },
     ));
     if (sessionCookie != null) {
