@@ -34,6 +34,20 @@ class EmptyThreadPage implements Exception {
   }
 }
 
+class TooManyBookmarks implements Exception {
+  @override
+  String toString() {
+    return 'Could not add a new bookmark, too many bookmarks already set.';
+  }
+}
+
+class UnspecificBookmarkError implements Exception {
+  @override
+  String toString() {
+    return 'Could not add a new bookmark, received unspecific error from server.';
+  }
+}
+
 class XmlError implements Exception {
   final String message;
 

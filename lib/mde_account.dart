@@ -5,8 +5,59 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'mde_exceptions.dart';
+
 class MDEAccount {
   MDEAccount._();
+
+  static addBookmark({
+    @required final int postId,
+    @required final String setBookmarkToken,
+  }) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final String sessionCookie = sharedPreferences.getString('sessioncookie');
+
+    HttpClient httpClient = HttpClient();
+    HttpClientRequest request = await httpClient.getUrl(Uri.http(
+      'forum.mods.de',
+      'bb/async/set-bookmark.php',
+      {
+        'PID': postId.toString(),
+        'token': setBookmarkToken,
+      },
+    ));
+    if (sessionCookie != null) {
+      request.cookies.add(Cookie.fromSetCookieValue(sessionCookie));
+    }
+    HttpClientResponse response = await request.close();
+
+    if (response.statusCode == 200) {
+      // update session cookie
+      if (sessionCookie != null) {
+        // keep the last cookie for MDESID
+        Cookie cookie = response.cookies.lastWhere((Cookie cookie) {
+          return cookie.name == 'MDESID';
+        });
+
+        await sharedPreferences.setString('sessioncookie', cookie.toString());
+      }
+
+      final String reply = await response.transform(utf8.decoder).join();
+      final int result = int.parse(reply.split(RegExp(r'\s'))[0]);
+      if (result == 1) {
+        // success
+        return;
+      }
+      if (result == 2) {
+        // cannot add any more bookmarks
+        throw TooManyBookmarks();
+      }
+    } else {
+      response.drain();
+    }
+
+    throw UnspecificBookmarkError();
+  }
 
   static clearLoginInformation({final Duration nextLoginDialog}) async {
     // invalidate cookie and user information in preferences

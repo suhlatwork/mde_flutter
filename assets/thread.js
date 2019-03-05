@@ -97,6 +97,35 @@ $(document).ready(function() {
 
         openUrl(url.toString());
     });
+
+    $('button.post-menu-button').on('click', function() {
+        var hidden = $(this).parent().find('div.post-menu').hasClass('post-menu-hidden');
+        $('div.post-menu').addClass('post-menu-hidden');
+        if (hidden === true) {
+            $(this).parent().find('div.post-menu').removeClass('post-menu-hidden');
+        }
+
+        return false;
+    });
+
+    $('div.post-menu-item').on('click', function() {
+        var threadTitle = $(this).parents('div.thread').attr('data-thread-title');
+        var postId = Number($(this).parents('div.post').attr('data-id'));
+        var setBookmarkToken = $(this).parents('div.post').attr('data-bookmark-token');
+        setBookmark.postMessage(
+            JSON.stringify(
+                {
+                    threadTitle: threadTitle,
+                    postId: postId,
+                    setBookmarkToken: setBookmarkToken
+                }
+            )
+        );
+    });
+
+    $(document).on('click', function() {
+        $('div.post-menu').addClass('post-menu-hidden');
+    });
 });
 
 function openUrl(url) {

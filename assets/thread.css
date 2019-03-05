@@ -22,6 +22,22 @@ body {
     float:right;
 }
 
+.post .header .post-buttons .post-menu {
+    display: inline-block;
+    float: right;
+    position: absolute;
+    right: 10px;
+    width: max-content;
+}
+
+.post .header .post-buttons .post-menu-item {
+    display: block;
+}
+
+.post .header .post-buttons .post-menu-hidden {
+    display: none;
+}
+
 .post .header {
     overflow:auto;
 }

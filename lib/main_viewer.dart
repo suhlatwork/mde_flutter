@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -9,6 +10,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'http_server.dart';
 import 'main_drawer.dart';
 import 'mde_account.dart';
+import 'mde_exceptions.dart';
 import 'password_dialog.dart';
 
 class MainViewer extends StatefulWidget {
@@ -71,6 +73,12 @@ class _MainViewerState extends State<MainViewer> with WidgetsBindingObserver {
                       name: 'errorDisplay',
                       onMessageReceived: (final JavascriptMessage message) {
                         _handleErrorDisplay(context, message.message);
+                      },
+                    ),
+                    JavascriptChannel(
+                      name: 'setBookmark',
+                      onMessageReceived: (final JavascriptMessage message) {
+                        _handleSetBookmark(context, message.message);
                       },
                     ),
                     JavascriptChannel(
@@ -216,6 +224,44 @@ class _MainViewerState extends State<MainViewer> with WidgetsBindingObserver {
     );
     if (await (await _controllerCompleter.future).canGoBack()) {
       (await _controllerCompleter.future).goBack();
+    }
+  }
+
+  _handleSetBookmark(BuildContext context, final String address) async {
+    final Map<String, dynamic> arguments = jsonDecode(address);
+
+    try {
+      await MDEAccount.addBookmark(
+        postId: arguments['postId'],
+        setBookmarkToken: arguments['setBookmarkToken'],
+      );
+
+      Scaffold.of(context).removeCurrentSnackBar();
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Lesezeichen für Thread "${arguments['threadTitle']}" gesetzt.',
+          ),
+        ),
+      );
+    } on TooManyBookmarks {
+      Scaffold.of(context).removeCurrentSnackBar();
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Lesezeichen für Thread "${arguments['threadTitle']}" konnte nicht gesetzt werden: zu viele Lesezeichen.',
+          ),
+        ),
+      );
+    } on UnspecificBookmarkError {
+      Scaffold.of(context).removeCurrentSnackBar();
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Lesezeichen für Thread "${arguments['threadTitle']}" konnte nicht gesetzt werden.',
+          ),
+        ),
+      );
     }
   }
 

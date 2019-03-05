@@ -266,6 +266,16 @@ class Thread with TemplateFiller {
           postInfo['lastEditDate'] = dateFormat.format(date);
         }
 
+        // when logged in the element 'post' should contain an element
+        // 'token-setbookmark'
+        candidates = post.findElements('token-setbookmark');
+        if (candidates.length != 0) {
+          if (candidates.length != 1) {
+            throw Exception('token-setbookmark element missing from post!');
+          }
+          postInfo['setBookmarkToken'] = candidates.first.getAttribute('value');
+        }
+
         postInfo['isAuthor'] = false;
         postInfo['getAuthorLocked'] = false;
 
