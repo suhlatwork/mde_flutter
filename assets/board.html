@@ -16,7 +16,11 @@
 <div class="board"
      data-board-id="{{boardId}}"
      data-board-title="{{boardTitle}}"
-     data-page="{{boardPage}}">
+     data-page="{{boardPage}}"
+     {{#canCreateThread}}
+     data-newthread-token="{{newThreadToken}}"
+     {{/canCreateThread}}
+>
     {{#threads}}
     <div class="thread{{#isSpecial}}-special{{/isSpecial}}"
          data-thread-id="{{id}}"

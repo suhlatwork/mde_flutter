@@ -107,6 +107,19 @@ class Board with TemplateFiller {
       final String boardName = candidates.first.text;
       boardInfo['boardTitle'] = boardName;
 
+      // the element 'board' should contain an element 'token-newthread' for
+      // logged in users
+      candidates = board.findElements('token-newthread');
+      if (candidates.length != 0) {
+        if (candidates.length != 1) {
+          throw Exception('token-newthread element missing from post!');
+        }
+        boardInfo['canCreateThread'] = true;
+        boardInfo['newThreadToken'] = candidates.first.getAttribute('value');
+      } else {
+        boardInfo['canCreateThread'] = false;
+      }
+
       // the element 'board' should contain an element 'threads'
       candidates = board.findElements('threads');
       if (candidates.length != 1) {

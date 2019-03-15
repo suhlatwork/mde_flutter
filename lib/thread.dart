@@ -121,6 +121,19 @@ class Thread with TemplateFiller {
       final int nrPages = int.parse(candidates.first.getAttribute('value'));
       threadInfo['threadNrPages'] = nrPages;
 
+      // the element 'thread' should contain an element 'token-newreply' for
+      // logged in users
+      candidates = thread.findElements('token-newreply');
+      if (candidates.length != 0) {
+        if (candidates.length != 1) {
+          throw Exception('token-newreply element missing from post!');
+        }
+        threadInfo['canCreatePost'] = true;
+        threadInfo['newReplyToken'] = candidates.first.getAttribute('value');
+      } else {
+        threadInfo['canCreatePost'] = false;
+      }
+
       // the element 'posts' should contain an element 'thread'
       candidates = thread.findElements('posts');
       if (candidates.length != 1) {
@@ -273,6 +286,19 @@ class Thread with TemplateFiller {
             throw Exception('token-setbookmark element missing from post!');
           }
           postInfo['setBookmarkToken'] = candidates.first.getAttribute('value');
+        }
+
+        // if the post was created by the current user, the element 'post'
+        // // should contain an element 'token-editreply'
+        candidates = post.findElements('token-editreply');
+        if (candidates.length != 0) {
+          if (candidates.length != 1) {
+            throw Exception('token-editreply element missing from post!');
+          }
+          postInfo['canEditPost'] = true;
+          postInfo['editReplyToken'] = candidates.first.getAttribute('value');
+        } else {
+          postInfo['canEditPost'] = false;
         }
 
         postInfo['isAuthor'] = false;

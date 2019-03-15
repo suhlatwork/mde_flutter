@@ -20,7 +20,11 @@
      data-thread-id="{{threadId}}"
      data-thread-title="{{threadTitle}}"
      data-page="{{threadPage}}"
-     data-number-of-pages="{{threadNrPages}}">
+     data-number-of-pages="{{threadNrPages}}"
+     {{#canCreatePost}}
+     data-newreply-token="{{newReplyToken}}"
+     {{/canCreatePost}}
+>
     {{#posts}}
     <div class="post"
          data-id="{{id}}"
@@ -31,6 +35,9 @@
          {{#isLoggedIn}}
          data-bookmark-token="{{setBookmarkToken}}"
          {{/isLoggedIn}}
+         {{#canEditPost}}
+         data-editreply-token="{{editReplyToken}}"
+         {{/canEditPost}}
     >
         <a name="{{id}}"></a>
         <div class="header">
