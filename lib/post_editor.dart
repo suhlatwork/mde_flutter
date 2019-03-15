@@ -59,21 +59,24 @@ class _PostEditorState extends State<PostEditor> {
   Completer<String> _initialPostTitle;
   Future<List> _initialValues;
 
-  String _postContent;
+  TextEditingController _controllerPostContent;
+  TextEditingController _controllerPostTitle;
+  TextEditingController _controllerThreadTitle;
+
   int _postIcon;
-  String _postTitle;
-  String _threadTitle;
 
   @override
   initState() {
     super.initState();
 
-    _threadTitle = '';
+    _controllerPostContent = TextEditingController();
+    _controllerPostTitle = TextEditingController();
+    _controllerThreadTitle = TextEditingController(
+      text: '',
+    );
 
     // initialized from the 'Completer's later on
-    _postContent = null;
     _postIcon = null;
-    _postTitle = null;
 
     _initialPostContent = Completer<String>();
     _initialPostIcon = Completer<int>();
@@ -81,13 +84,13 @@ class _PostEditorState extends State<PostEditor> {
     _initialValues = Future.wait(
       [
         _initialPostContent.future.then((value) {
-          _postContent = value;
+          _controllerPostContent.text = value;
         }),
         _initialPostIcon.future.then((value) {
           _postIcon = value;
         }),
         _initialPostTitle.future.then((value) {
-          _postTitle = value;
+          _controllerPostTitle.text = value;
         }),
       ],
     );
@@ -119,11 +122,8 @@ class _PostEditorState extends State<PostEditor> {
       ),
       Padding(
         child: TextFormField(
-          initialValue: _postTitle,
+          controller: _controllerPostTitle,
           maxLength: 65,
-          onSaved: (value) {
-            _postTitle = value;
-          },
         ),
         padding: EdgeInsets.all(24),
       ),
@@ -137,11 +137,8 @@ class _PostEditorState extends State<PostEditor> {
       ),
       Padding(
         child: TextFormField(
-          initialValue: _threadTitle,
+          controller: _controllerThreadTitle,
           maxLength: 65,
-          onSaved: (value) {
-            _threadTitle = value;
-          },
         ),
         padding: EdgeInsets.all(24),
       ),
@@ -150,11 +147,8 @@ class _PostEditorState extends State<PostEditor> {
       ),
       Padding(
         child: TextFormField(
-          initialValue: _postTitle,
+          controller: _controllerPostTitle,
           maxLength: 65,
-          onSaved: (value) {
-            _postTitle = value;
-          },
         ),
         padding: EdgeInsets.all(24),
       ),
@@ -247,12 +241,9 @@ class _PostEditorState extends State<PostEditor> {
                               {currentLength, maxLength, isFocused}) {
                             return null;
                           },
-                          initialValue: _postContent,
+                          controller: _controllerPostContent,
                           maxLength: 15000,
                           maxLines: null,
-                          onSaved: (value) {
-                            _postContent = value;
-                          },
                         ),
                         padding: EdgeInsets.all(24),
                       ),
@@ -398,9 +389,9 @@ ${values[1]}
         {
           'PID': widget.postId,
           'token': widget.token,
-          'edit_title': _postTitle,
+          'edit_title': _controllerPostTitle.text,
           'edit_icon': _postIcon,
-          'message': _postContent,
+          'message': _controllerPostContent.text,
           'edit_converturls': 1,
           'edit_disablebbcode': 0,
           'edit_disablesmilies': 0,
@@ -418,9 +409,9 @@ ${values[1]}
         {
           'TID': widget.threadId,
           'token': widget.token,
-          'post_title': _postTitle,
+          'post_title': _controllerPostTitle.text,
           'post_icon': _postIcon,
-          'message': _postContent,
+          'message': _controllerPostContent.text,
           'post_converturls': 1,
           'post_disablebbcode': 0,
           'post_disablesmilies': 0,
@@ -438,10 +429,10 @@ ${values[1]}
         {
           'BID': widget.boardId,
           'token': widget.token,
-          'thread_title': _threadTitle,
-          'thread_subtitle': _postTitle,
+          'thread_title': _controllerThreadTitle.text,
+          'thread_subtitle': _controllerPostTitle.text,
           'thread_icon': _postIcon,
-          'message': _postContent,
+          'message': _controllerPostContent.text,
           'thread_converturls': 1,
           'thread_disablebbcode': 0,
           'thread_disablesmilies': 0,
