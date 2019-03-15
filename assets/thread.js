@@ -108,7 +108,7 @@ $(document).ready(function() {
         return false;
     });
 
-    $('div.post-menu-item').on('click', function() {
+    $('div.post-menu-item-bookmark').on('click', function() {
         var threadTitle = $(this).parents('div.thread').attr('data-thread-title');
         var postId = Number($(this).parents('div.post').attr('data-id'));
         var setBookmarkToken = $(this).parents('div.post').attr('data-bookmark-token');
