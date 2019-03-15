@@ -58,8 +58,6 @@ $(document).ready(function() {
     $('button.fab-button').on('click', function() {
         var boardId = Number($('div.board').attr('data-board-id'));
         var newThreadToken = $('div.board').attr('data-newthread-token');
-        console.log(boardId);
-        console.log(newThreadToken);
         newThread.postMessage(
             JSON.stringify(
                 {
