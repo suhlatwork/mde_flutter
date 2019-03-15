@@ -5,6 +5,7 @@ import 'package:html/dom.dart' as html;
 import 'package:html/parser.dart' show parse;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'mde_codec.dart';
 import 'mde_exceptions.dart';
 import 'password_dialog.dart';
 
@@ -42,7 +43,7 @@ class MDEAccount {
         await MDEAccount.updateSessionCookie(cookie);
       }
 
-      final String reply = await response.transform(utf8.decoder).join();
+      final String reply = await response.transform(mdeXmlDecoder).join();
       final int result = int.parse(reply.split(RegExp(r'\s'))[0]);
       if (result == 1) {
         // success
@@ -116,7 +117,7 @@ class MDEAccount {
 
     if (response.statusCode == 200) {
       final html.Document document =
-          parse(await response.transform(utf8.decoder).join());
+          parse(await response.transform(mdeCodec.decoder).join());
       final bool success =
           document.getElementsByClassName('box success').length == 1;
       final bool error =
@@ -251,7 +252,7 @@ class MDEAccount {
     if (response.statusCode == 200) {
       // if the call to the server was successful, parse the HTML
       final html.Document document =
-          parse(await response.transform(latin1.decoder).join());
+          parse(await response.transform(mdeCodec.decoder).join());
 
       final Uri logoutUrl = Uri.parse(
           document.querySelectorAll('a').firstWhere((html.Element element) {
@@ -284,7 +285,7 @@ class MDEAccount {
 
       if (logoutResponse.statusCode == 200) {
         final html.Document logoutDocument =
-            parse(await logoutResponse.transform(latin1.decoder).join());
+            parse(await logoutResponse.transform(mdeCodec.decoder).join());
 
         final bool success =
             logoutDocument.getElementsByClassName('box success').length == 1;
@@ -337,7 +338,7 @@ class MDEAccount {
         await MDEAccount.updateSessionCookie(cookie);
       }
 
-      final String reply = await response.transform(utf8.decoder).join();
+      final String reply = await response.transform(mdeXmlDecoder).join();
       final int result = int.parse(reply.split(RegExp(r'\s'))[0]);
       if (result == 1) {
         // success

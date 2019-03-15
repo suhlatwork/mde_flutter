@@ -1,10 +1,10 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:xml/xml.dart' as xml;
 
 import 'mde_account.dart';
+import 'mde_codec.dart';
 import 'mde_exceptions.dart';
 import 'template_filler.dart';
 
@@ -52,7 +52,7 @@ class Boards with TemplateFiller {
       // the decoding causing trouble with umlauts
       // the XML document currently specifies UTF-8 so this is hard-coded here
       final xml.XmlDocument document =
-          xml.parse(await response.transform(utf8.decoder).join());
+          xml.parse(await response.transform(mdeXmlDecoder).join());
 
       Map<String, Object> boardsInfo = {
         'categories': [],

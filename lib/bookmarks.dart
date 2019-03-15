@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:xml/xml.dart' as xml;
 
 import 'mde_account.dart';
+import 'mde_codec.dart';
 import 'mde_exceptions.dart';
 
 class _XmlTrimmer extends xml.XmlVisitor {
@@ -100,7 +100,7 @@ class Bookmarks {
       // the decoding causing trouble with umlauts
       // the XML document currently specifies UTF-8 so this is hard-coded here
       final xml.XmlDocument document =
-          xml.parse(await response.transform(utf8.decoder).join());
+          xml.parse(await response.transform(mdeXmlDecoder).join());
 
       // trim text nodes that can be trimmed to an empty string, ...
       _XmlTrimmer().visit(document);

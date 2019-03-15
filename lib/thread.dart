@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
@@ -7,6 +6,7 @@ import 'package:xml/xml.dart' as xml;
 import 'mde_account.dart';
 import 'mde_bbcode_parser.dart';
 import 'mde_bender_cache.dart';
+import 'mde_codec.dart';
 import 'mde_exceptions.dart';
 import 'mde_icons.dart';
 import 'template_filler.dart';
@@ -78,7 +78,7 @@ class Thread with TemplateFiller {
       // the decoding causing trouble with umlauts
       // the XML document currently specifies UTF-8 so this is hard-coded here
       final xml.XmlDocument document =
-          xml.parse(await response.transform(utf8.decoder).join());
+          xml.parse(await response.transform(mdeXmlDecoder).join());
 
       Map<String, Object> threadInfo = {
         'threadId': threadId,
