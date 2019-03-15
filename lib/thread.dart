@@ -202,7 +202,7 @@ class Thread with TemplateFiller {
             throw Exception('icon element missing from post!');
           }
           final int id = int.parse(candidates.first.getAttribute('id'));
-          postInfo['icon'] = mdeIcons[id].postIcon;
+          postInfo['icon'] = mdeIcons[id]?.postIcon ?? MDEBrokenIcon().postIcon;
         } else {
           postInfo['icon'] = '';
         }

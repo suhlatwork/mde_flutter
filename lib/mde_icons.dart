@@ -75,5 +75,4 @@ final Map<int, MDEIcon> mdeIcons = {
     'pfeil.gif',
     'Pfeil',
   ),
-  55: MDEBrokenIcon(),
 };
