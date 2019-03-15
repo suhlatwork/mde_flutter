@@ -11,6 +11,7 @@ import 'http_server.dart';
 import 'main_drawer.dart';
 import 'mde_account.dart';
 import 'mde_exceptions.dart';
+import 'post_editor.dart';
 
 class MainViewer extends StatefulWidget {
   @override
@@ -69,9 +70,27 @@ class _MainViewerState extends State<MainViewer> with WidgetsBindingObserver {
                       },
                     ),
                     JavascriptChannel(
+                      name: 'editPost',
+                      onMessageReceived: (final JavascriptMessage message) {
+                        _handleEditPost(context, message.message);
+                      },
+                    ),
+                    JavascriptChannel(
                       name: 'errorDisplay',
                       onMessageReceived: (final JavascriptMessage message) {
                         _handleErrorDisplay(context, message.message);
+                      },
+                    ),
+                    JavascriptChannel(
+                      name: 'newPost',
+                      onMessageReceived: (final JavascriptMessage message) {
+                        _handleNewPost(context, message.message);
+                      },
+                    ),
+                    JavascriptChannel(
+                      name: 'newThread',
+                      onMessageReceived: (final JavascriptMessage message) {
+                        _handleNewThread(context, message.message);
                       },
                     ),
                     JavascriptChannel(
@@ -174,6 +193,24 @@ class _MainViewerState extends State<MainViewer> with WidgetsBindingObserver {
     }
   }
 
+  _handleEditPost(BuildContext context, final String address) async {
+    final Map<String, dynamic> arguments = jsonDecode(address);
+
+    _handlePostEditor(
+      context,
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PostEditor.editPost(
+                threadId: arguments['threadId'],
+                postId: arguments['postId'],
+                token: arguments['editReplyToken'],
+              ),
+        ),
+      ),
+    );
+  }
+
   _handleErrorDisplay(BuildContext context, final String message) async {
     Scaffold.of(context).removeCurrentSnackBar();
     Scaffold.of(context).showSnackBar(
@@ -224,6 +261,65 @@ class _MainViewerState extends State<MainViewer> with WidgetsBindingObserver {
         ),
       );
     }
+  }
+
+  _handleNewPost(BuildContext context, final String address) async {
+    final Map<String, dynamic> arguments = jsonDecode(address);
+    _handlePostEditor(
+      context,
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PostEditor.newPost(
+                threadId: arguments['threadId'],
+                postId: arguments['postId'],
+                token: arguments['newReplyToken'],
+              ),
+        ),
+      ),
+    );
+  }
+
+  _handleNewThread(BuildContext context, final String address) async {
+    final Map<String, dynamic> arguments = jsonDecode(address);
+
+    _handlePostEditor(
+      context,
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PostEditor.newThread(
+                boardId: arguments['boardId'],
+                token: arguments['newThreadToken'],
+              ),
+        ),
+      ),
+    );
+  }
+
+  _handlePostEditor(BuildContext context, Future<List<int>> data) async {
+    List<int> arguments = await data;
+    if (arguments == null) {
+      // Navigator was popped without an argument, must likely the back button
+      // was used
+      return;
+    }
+
+    Map<String, String> queryParameters = {
+      'TID': arguments[0].toString(),
+    };
+    if (arguments.length > 1) {
+      queryParameters['PID'] = arguments[1].toString();
+    }
+
+    Uri localUri = Uri.http('', '').replace(
+      host: InternetAddress.loopbackIPv6.host,
+      path: '/thread',
+      port: await HttpServerWrapper.port.future,
+      queryParameters: queryParameters,
+    );
+
+    (await _controllerCompleter.future).loadUrl(localUri.toString());
   }
 
   _handleUrlOpener(BuildContext context, final String address) async {

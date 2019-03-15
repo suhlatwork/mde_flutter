@@ -123,8 +123,51 @@ $(document).ready(function() {
         );
     });
 
+    $('div.post-menu-item-edit').on('click', function() {
+        var threadId = Number($(this).parents('div.thread').attr('data-thread-id'));
+        var postId = Number($(this).parents('div.post').attr('data-id'));
+        var editReplyToken = $(this).parents('div.post').attr('data-editreply-token');
+        editPost.postMessage(
+            JSON.stringify(
+                {
+                    editReplyToken: editReplyToken,
+                    threadId: threadId,
+                    postId: postId,
+                }
+            )
+        );
+    });
+
+    $('div.post-menu-item-cite').on('click', function() {
+        var threadId = Number($(this).parents('div.thread').attr('data-thread-id'));
+        var postId = Number($(this).parents('div.post').attr('data-id'));
+        var newReplyToken = $(this).parents('div.thread').attr('data-newreply-token');
+        newPost.postMessage(
+            JSON.stringify(
+                {
+                    newReplyToken: newReplyToken,
+                    threadId: threadId,
+                    postId: postId,
+                }
+            )
+        );
+    });
+
     $(document).on('click', function() {
         $('div.post-menu').addClass('post-menu-hidden');
+    });
+
+    $('button.fab-button').on('click', function() {
+        var threadId = Number($('div.thread').attr('data-thread-id'));
+        var newReplyToken = $('div.thread').attr('data-newreply-token');
+        newPost.postMessage(
+            JSON.stringify(
+                {
+                    newReplyToken: newReplyToken,
+                    threadId: threadId,
+                }
+            )
+        );
     });
 });
 

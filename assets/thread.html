@@ -48,6 +48,16 @@
                     <div class="post-menu-item post-menu-item-bookmark">
                         Bookmark setzen
                     </div>
+                    {{#canEditPost}}
+                    <div class="post-menu-item post-menu-item-edit">
+                        Beitrag bearbeiten
+                    </div>
+                    {{/canEditPost}}
+                    {{#canCreatePost}}
+                    <div class="post-menu-item post-menu-item-cite">
+                        Beitrag zitieren
+                    </div>
+                    {{/canCreatePost}}
                 </div>
             </div>
             {{/isLoggedIn}}
@@ -85,6 +95,10 @@
         Ende der letzten Seite erreicht.
     </div>
     {{/isLastPage}}
+</div>
+
+<div class="fab">
+    <button class="fab-button"><i class="material-icons">add</i></button>
 </div>
 
 <script src="/assets/jquery.min.js"></script>

@@ -348,3 +348,24 @@ body {
     text-align: center;
     padding: 0 7px 7px 7px;
 }
+
+.fab {
+    bottom: 15px;
+    position: fixed;
+    right: 15px;
+}
+
+.fab button {
+    background-color: #ff0000;
+    border: 0;
+    border-radius: 100%;
+    box-shadow: 0 3px 6px;  // 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    display: block;
+    height: 55px;
+    outline: none;
+    width: 55px;
+}
+
+.fab .material-icons {
+    vertical-align: text-bottom;
+}

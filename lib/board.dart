@@ -238,7 +238,8 @@ class Board with TemplateFiller {
             throw Exception('icon element missing from post!');
           }
           final int id = int.parse(candidates.first.getAttribute('id'));
-          threadInfo['icon'] = mdeIcons[id]?.threadIcon ?? MDEBrokenIcon().threadIcon;
+          threadInfo['icon'] =
+              mdeIcons[id]?.threadIcon ?? MDEBrokenIcon().threadIcon;
         } else {
           threadInfo['icon'] = '';
         }
