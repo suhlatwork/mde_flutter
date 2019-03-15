@@ -1,8 +1,10 @@
 class MDEIcon {
+  final String fileName;
+
   final String postIcon;
   final String threadIcon;
 
-  MDEIcon(final String fileName, final String alternativeText)
+  MDEIcon(this.fileName, final String alternativeText)
       : postIcon =
             '<img class="posticon" src="/assets/icons/$fileName" alt="$alternativeText">',
         threadIcon =
@@ -10,6 +12,7 @@ class MDEIcon {
 }
 
 class MDEBrokenIcon implements MDEIcon {
+  final String fileName = null;
   final String postIcon = '<i class="material-icons">&#xe3ad;</i>';
   final String threadIcon = '<i class="material-icons">&#xe3ad;</i>';
 }
