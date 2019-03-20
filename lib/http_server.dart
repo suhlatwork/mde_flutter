@@ -26,14 +26,18 @@ class HttpServerWrapper {
     mimeTypeResolver.addExtension(".woff2", "font/woff2");
     mimeTypeResolver.addMagicNumber([0x77, 0x4f, 0x46, 0x32], "font/woff2");
 
-    await stop();
-
     if (!port.isCompleted) {
       _server = await HttpServer.bind(InternetAddress.loopbackIPv6, 0);
       port.complete(_server.port);
     } else {
-      _server = await HttpServer.bind(
-          InternetAddress.loopbackIPv6, await port.future);
+      try {
+        _server = await HttpServer.bind(
+            InternetAddress.loopbackIPv6, await port.future);
+      } on SocketException {
+        // server socket already open, let us hope by this app and silently
+        // continue
+        return;
+      }
     }
     debugPrint('start http server ${await port.future}');
 
