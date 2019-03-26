@@ -1,6 +1,23 @@
+// mde_flutter - A cross platform viewer for the mods.de forum.
+// Copyright (C) 2019  Sebastian Uhl
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:package_info/package_info.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'bookmarks.dart';
@@ -232,6 +249,27 @@ class _MainDrawerState extends State<MainDrawer> {
               ],
             );
           }
+
+          children.addAll(
+            <Widget>[
+              Divider(),
+              FutureBuilder(
+                future: PackageInfo.fromPlatform(),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return AboutListTile(
+                      applicationName: snapshot.data.appName,
+                      applicationVersion: snapshot.data.version,
+                    );
+                  }
+
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                },
+              ),
+            ],
+          );
 
           return ListView(
             children: children,
