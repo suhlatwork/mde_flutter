@@ -23,7 +23,8 @@ class _QuoteTag extends BBCodeTag {
   _QuoteTag() : super('quote');
 
   @override
-  String toHtml(final String inner, final String argument) {
+  String toHtml(
+      final String argument, final String innerBBCode, final String innerHtml) {
     if (argument != null) {
       final int split1 = argument.indexOf(',');
       final int split2 = argument.indexOf(',', split1 + 1);
@@ -40,11 +41,11 @@ class _QuoteTag extends BBCodeTag {
           '<a href="http://forum.mods.de/bb/thread.php?TID=$threadId&PID=$postId" class="author">'
           '<i class="material-icons">&#xE244;</i>'
           '$author</a>'
-          '<div class="content">$inner</div>'
+          '<div class="content">$innerHtml</div>'
           '</div>';
     }
 
-    return '<div class="quote"><div class="content">$inner</div></div>';
+    return '<div class="quote"><div class="content">$innerHtml</div></div>';
   }
 }
 
@@ -52,8 +53,9 @@ class _MonospaceTag extends BBCodeTag {
   _MonospaceTag() : super('m');
 
   @override
-  String toHtml(final String inner, final String argument) {
-    return '<pre class="inline">$inner</pre>';
+  String toHtml(
+      final String argument, final String innerBBCode, final String innerHtml) {
+    return '<pre class="inline">$innerHtml</pre>';
   }
 }
 
@@ -61,8 +63,9 @@ class _StrikeTag extends BBCodeTag {
   _StrikeTag() : super('s');
 
   @override
-  String toHtml(final String inner, final String argument) {
-    return '<span class="strike">$inner</span>';
+  String toHtml(
+      final String argument, final String innerBBCode, final String innerHtml) {
+    return '<span class="strike">$innerHtml</span>';
   }
 }
 
@@ -70,8 +73,9 @@ class _ModTag extends BBCodeTag {
   _ModTag() : super('mod');
 
   @override
-  String toHtml(final String inner, final String argument) {
-    return '<span class="mod">$inner</span>';
+  String toHtml(
+      final String argument, final String innerBBCode, final String innerHtml) {
+    return '<span class="mod">$innerHtml</span>';
   }
 }
 
@@ -79,11 +83,12 @@ class _SpoilerTag extends BBCodeTag {
   _SpoilerTag() : super('spoiler');
 
   @override
-  String toHtml(final String inner, final String argument) {
+  String toHtml(
+      final String argument, final String innerBBCode, final String innerHtml) {
     return '<div class="media spoiler">'
         '<i class="material-icons">&#xE8F5;</i>'
         '<button class="viewer mdl-button mdl-js-button">Spoiler zeigen</button>'
-        '<div class="spoiler-content">$inner</div>'
+        '<div class="spoiler-content">$innerHtml</div>'
         '</div>';
   }
 }
@@ -92,8 +97,9 @@ class _TriggerTag extends BBCodeTag {
   _TriggerTag() : super('trigger');
 
   @override
-  String toHtml(final String inner, final String argument) {
-    return '<span class="trigger">$inner</span>';
+  String toHtml(
+      final String argument, final String innerBBCode, final String innerHtml) {
+    return '<span class="trigger">$innerHtml</span>';
   }
 }
 
@@ -101,8 +107,9 @@ class _CodeTag extends BBCodeTag {
   _CodeTag() : super('code', container: false);
 
   @override
-  String toHtml(final String inner, final String argument) {
-    return '<div class="code">$inner</div>';
+  String toHtml(
+      final String argument, final String innerBBCode, final String innerHtml) {
+    return '<div class="code">$innerHtml</div>';
   }
 }
 
@@ -110,7 +117,8 @@ class _TexTag extends BBCodeTag {
   _TexTag() : super('tex', container: false);
 
   @override
-  String toHtml(final String inner, final String argument) {
+  String toHtml(
+      final String argument, final String innerBBCode, final String innerHtml) {
     Uri uri = Uri.https(
       'chart.googleapis.com',
       'chart',
@@ -118,7 +126,7 @@ class _TexTag extends BBCodeTag {
         'chco': 'ffffff',
         'chf': 'bg,s,394E63',
         'cht': 'tx',
-        'chl': inner,
+        'chl': innerHtml,
       },
     );
     return '<img src="$uri" class="tex" />';
@@ -129,16 +137,17 @@ class _ImageTag extends BBCodeTag {
   _ImageTag() : super('img', container: false);
 
   @override
-  String toHtml(final String inner, final String argument) {
+  String toHtml(
+      final String argument, final String innerBBCode, final String innerHtml) {
     String typeClass = 'img';
     String icon = '&#xE410;';
 
-    if (inner.substring(inner.length - 3) == 'gif') {
+    if (innerHtml.substring(argument.length - 3) == 'gif') {
       typeClass = 'gif';
       icon = '&#xE54D;';
     }
 
-    return '<div class="media $typeClass" data-src="$inner">'
+    return '<div class="media $typeClass" data-src="$innerHtml">'
         '<i class="material-icons">$icon</i>'
         '<button class="inline mdl-button mdl-js-button">Inline</button>'
         '<button class="viewer mdl-button mdl-js-button">Viewer</button>'
@@ -150,8 +159,9 @@ class _VideoTag extends BBCodeTag {
   _VideoTag() : super('video');
 
   @override
-  String toHtml(final String inner, final String argument) {
-    Uri uri = Uri.parse(inner);
+  String toHtml(
+      final String argument, final String innerBBCode, final String innerHtml) {
+    Uri uri = Uri.parse(innerHtml);
     if (uri.host == "www.youtube.com" || uri.host == "youtu.be") {
       String id;
       if (uri.host == "www.youtube.com") {
@@ -183,8 +193,9 @@ class _UrlTag extends BBCodeTag {
   _UrlTag() : super('url');
 
   @override
-  String toHtml(final String inner, final String argument) {
-    String url = inner;
+  String toHtml(
+      final String argument, final String innerBBCode, final String innerHtml) {
+    String url = innerHtml;
     if (argument?.isNotEmpty ?? false) {
       url = argument;
 
@@ -193,7 +204,7 @@ class _UrlTag extends BBCodeTag {
       }
     }
 
-    return '<a href="$url">$inner</a>';
+    return '<a href="$url">$innerHtml</a>';
   }
 }
 
@@ -201,11 +212,12 @@ class _UrlImageTag extends BBCodeTag {
   _UrlImageTag() : super('', container: false);
 
   @override
-  String toHtml(final String inner, final String argument) {
+  String toHtml(
+      final String argument, final String innerBBCode, final String innerHtml) {
     String typeClass = 'img-link';
     String icon = '&#xE410;';
 
-    if (inner.substring(inner.length - 3) == 'gif') {
+    if (innerHtml.substring(innerHtml.length - 3) == 'gif') {
       typeClass = 'gif-link';
       icon = '&#xE54D;';
     }
@@ -215,7 +227,7 @@ class _UrlImageTag extends BBCodeTag {
       url = url.substring(1, url.length - 1);
     }
 
-    return '<div class="media $typeClass" data-src="$inner" data-href="$url">'
+    return '<div class="media $typeClass" data-src="$innerHtml" data-href="$url">'
         '<i class="material-icons">$icon</i>'
         '<button class="link mdl-button mdl-js-button">Link</button>'
         '<button class="inline mdl-button mdl-js-button">Inline</button>'

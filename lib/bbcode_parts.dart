@@ -37,13 +37,15 @@ class BBCodePart<T extends BBCodeTag> {
 
   String toHtml() {
     return tag.toHtml(
-        parts.fold(
-          '',
-          (prev, element) {
-            return prev + element.toHtml();
-          },
-        ),
-        argument);
+      argument,
+      bbCode,
+      parts.fold(
+        '',
+        (prev, element) {
+          return prev + element.toHtml();
+        },
+      ),
+    );
   }
 }
 
