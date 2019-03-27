@@ -276,9 +276,22 @@ class BBCodeParser {
       final BBCodeTag bbTag = parseState.openTags.last[0];
       parseState.parts = parseState.openTags.last[1];
       final String argument = parseState.openTags.last[2];
+      final int bbCodeStart = parseState.openTags.last[3];
       parseState.openTags.removeLast();
 
-      parseState.parts.add(BBCodePart(bbTag, innerParts, argument));
+      String bbCode =
+          parseState.bbCode.substring(bbCodeStart, parseState.posConsumed);
+      if (bbTag.trimInner) {
+        // left trim is taken into account via bbCodeStart
+        bbCode = bbCode.trimRight();
+      }
+
+      parseState.parts.add(BBCodePart(
+        bbTag,
+        bbCode,
+        innerParts,
+        argument,
+      ));
     }
   }
 
@@ -312,8 +325,12 @@ class BBCodeParser {
                     parseState.bbCode.substring(
                             parseState.posConsumed, nextTag.startIndex) ==
                         '') {
-                  parseState.openTags
-                      .add([requiredChild, parseState.parts, null]);
+                  parseState.openTags.add([
+                    requiredChild,
+                    parseState.parts,
+                    null,
+                    nextTag.endIndex,
+                  ]);
                   parseState.parts = List<BBCodePart>();
 
                   parseState.posConsumed = nextTag.endIndex;
@@ -327,8 +344,12 @@ class BBCodeParser {
                         parseState.bbCode.substring(
                                 parseState.posConsumed, nextTag.startIndex) ==
                             '')) {
-                  parseState.openTags
-                      .add([requiredChild, parseState.parts, null]);
+                  parseState.openTags.add([
+                    requiredChild,
+                    parseState.parts,
+                    null,
+                    parseState.posConsumed,
+                  ]);
                   parseState.parts = List<BBCodePart>();
                 }
               } else {
@@ -336,8 +357,12 @@ class BBCodeParser {
                 if (parseState.bbCode.substring(
                         parseState.posConsumed, parseState.bbCode.length) !=
                     '') {
-                  parseState.openTags
-                      .add([requiredChild, parseState.parts, null]);
+                  parseState.openTags.add([
+                    requiredChild,
+                    parseState.parts,
+                    null,
+                    parseState.posConsumed,
+                  ]);
                   parseState.parts = List<BBCodePart>();
                 }
               }
@@ -367,7 +392,12 @@ class BBCodeParser {
 
           parseState.posConsumed = tag.endIndex;
 
-          parseState.openTags.add([tag.bbTag, parseState.parts, tag.argument]);
+          parseState.openTags.add([
+            tag.bbTag,
+            parseState.parts,
+            tag.argument,
+            parseState.posConsumed,
+          ]);
           parseState.parts = List<BBCodePart>();
 
           BBCodeTag requiredChild = tag.bbTag.requiredChild;
@@ -381,8 +411,12 @@ class BBCodeParser {
                   parseState.bbCode.substring(
                           parseState.posConsumed, nextTag.startIndex) ==
                       '') {
-                parseState.openTags
-                    .add([requiredChild, parseState.parts, null]);
+                parseState.openTags.add([
+                  requiredChild,
+                  parseState.parts,
+                  null,
+                  nextTag.endIndex,
+                ]);
                 parseState.parts = List<BBCodePart>();
 
                 parseState.posConsumed = nextTag.endIndex;
@@ -395,8 +429,12 @@ class BBCodeParser {
                       parseState.bbCode.substring(
                               parseState.posConsumed, nextTag.startIndex) ==
                           '')) {
-                parseState.openTags
-                    .add([requiredChild, parseState.parts, null]);
+                parseState.openTags.add([
+                  requiredChild,
+                  parseState.parts,
+                  null,
+                  parseState.posConsumed,
+                ]);
                 parseState.parts = List<BBCodePart>();
               }
             } else {
@@ -404,8 +442,12 @@ class BBCodeParser {
               if (parseState.bbCode.substring(
                       parseState.posConsumed, parseState.bbCode.length) !=
                   '') {
-                parseState.openTags
-                    .add([requiredChild, parseState.parts, null]);
+                parseState.openTags.add([
+                  requiredChild,
+                  parseState.parts,
+                  null,
+                  parseState.posConsumed,
+                ]);
                 parseState.parts = List<BBCodePart>();
               }
             }
@@ -422,8 +464,8 @@ class BBCodeParser {
       _parseCloseTags(parseState);
     }
 
-    BBCodeDocument document =
-        BBCodeDocument(parseState.parts, htmlPostProcessor: htmlPostProcessor);
+    BBCodeDocument document = BBCodeDocument(bbCode, parseState.parts,
+        htmlPostProcessor: htmlPostProcessor);
 
     return document;
   }

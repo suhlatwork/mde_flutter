@@ -19,13 +19,14 @@ import 'bbcode_emoji.dart';
 
 class BBCodePart<T extends BBCodeTag> {
   final T tag;
+  final String bbCode;
   List<BBCodePart> parts;
   String argument;
 
-  BBCodePart(this.tag, this.parts, [this.argument]);
+  BBCodePart(this.tag, this.bbCode, this.parts, [this.argument]);
 
   BBCodePart deepCopy() {
-    BBCodePart copy = BBCodePart(tag, List<BBCodePart>(), argument);
+    BBCodePart copy = BBCodePart(tag, bbCode, List<BBCodePart>(), argument);
     parts.forEach(
       (element) {
         copy.parts.add(element.deepCopy());
@@ -47,19 +48,19 @@ class BBCodePart<T extends BBCodeTag> {
 }
 
 class BBCodePartText extends BBCodePart {
-  final String text;
   final BBCodeEmojiParser emojiParser;
 
-  BBCodePartText(this.text, [this.emojiParser]) : super(null, null);
+  BBCodePartText(final String text, [this.emojiParser])
+      : super(null, text, null);
 
   @override
   BBCodePartText deepCopy() {
-    return BBCodePartText(text, emojiParser);
+    return BBCodePartText(bbCode, emojiParser);
   }
 
   @override
   String toHtml() {
-    return (emojiParser?.toHtml(text) ?? text)
+    return (emojiParser?.toHtml(bbCode) ?? bbCode)
         .replaceAll('\r\n', '<br />')
         .replaceAll('\n', '<br />');
   }
@@ -68,11 +69,12 @@ class BBCodePartText extends BBCodePart {
 class BBCodeDocument extends BBCodePart {
   final Function(BBCodePart) htmlPostProcessor;
 
-  BBCodeDocument(parts, {this.htmlPostProcessor}) : super(null, parts);
+  BBCodeDocument(bbCode, parts, {this.htmlPostProcessor})
+      : super(null, bbCode, parts);
 
   @override
   BBCodeDocument deepCopy() {
-    BBCodeDocument copy = BBCodeDocument(List<BBCodePart>(),
+    BBCodeDocument copy = BBCodeDocument(bbCode, List<BBCodePart>(),
         htmlPostProcessor: htmlPostProcessor);
     parts.forEach(
       (element) {

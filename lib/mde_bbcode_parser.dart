@@ -323,8 +323,12 @@ _processMDEBBCode(BBCodePart part) {
         }
 
         final BBCodePart secondPart = _processUrlImageSplitSecond(currentPart);
-        part.parts[i] =
-            BBCodePart(_UrlImageTag(), secondPart.parts, currentPart.argument);
+        part.parts[i] = BBCodePart(
+          _UrlImageTag(),
+          currentPart.bbCode,
+          secondPart.parts,
+          currentPart.argument,
+        );
 
         BBCodePart thirdPart = _processUrlImageSplitThird(currentPart);
         if (thirdPart.parts.length > 0) {
