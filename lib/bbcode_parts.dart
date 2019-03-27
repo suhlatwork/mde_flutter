@@ -21,7 +21,7 @@ class BBCodePart<T extends BBCodeTag> {
   final T tag;
   final String bbCode;
   List<BBCodePart> parts;
-  String argument;
+  dynamic argument;
 
   BBCodePart(this.tag, this.bbCode, this.parts, [this.argument]);
 

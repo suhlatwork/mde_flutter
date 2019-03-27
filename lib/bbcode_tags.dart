@@ -28,15 +28,15 @@ abstract class BBCodeTag {
       this.trimInner = false});
 
   String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml);
+      final dynamic argument, final String innerBBCode, final String innerHtml);
 }
 
 class BBCodeBoldTag extends BBCodeTag {
   BBCodeBoldTag() : super('b');
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     return '<strong>$innerHtml</strong>';
   }
 }
@@ -45,8 +45,8 @@ class BBCodeUnderlineTag extends BBCodeTag {
   BBCodeUnderlineTag() : super('u');
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     return '<u>$innerHtml</u>';
   }
 }
@@ -55,8 +55,8 @@ class BBCodeItalicTag extends BBCodeTag {
   BBCodeItalicTag() : super('i');
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     return '<em>$innerHtml</em>';
   }
 }
@@ -66,12 +66,12 @@ class BBCodeListTag extends BBCodeTag {
       : super('list', requiredChild: BBCodeListItemTag(), trimInner: true);
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
-    if (argument == '1') {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
+    if (argument as String == '1') {
       return '<ol>$innerHtml</ol>';
     }
-    if (argument == 'a') {
+    if (argument as String == 'a') {
       return '<ol type="a">$innerHtml</ol>';
     }
 
@@ -83,8 +83,8 @@ class BBCodeListItemTag extends BBCodeTag {
   BBCodeListItemTag() : super('*', closePrevious: true, trimInner: true);
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     return '<li>$innerHtml</li>';
   }
 }
@@ -94,11 +94,11 @@ class BBCodeTableTag extends BBCodeTag {
       : super('table', requiredChild: BBCodeTableRowTag(), trimInner: true);
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     String style = '';
-    if (argument != null && argument.startsWith('border=')) {
-      final int border = int.parse(argument.substring(7));
+    if (argument != null && (argument as String).startsWith('border=')) {
+      final int border = int.parse((argument as String).substring(7));
       style = ' style="--border: ${border}px;"';
     }
     return '<table$style>$innerHtml</table>';
@@ -113,8 +113,8 @@ class BBCodeTableRowTag extends BBCodeTag {
             trimInner: true);
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     return '<tr>$innerHtml</tr>';
   }
 }
@@ -123,8 +123,8 @@ class BBCodeTableColumnTag extends BBCodeTag {
   BBCodeTableColumnTag() : super('||', closePrevious: true, trimInner: true);
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     return '<td>$innerHtml</td>';
   }
 }

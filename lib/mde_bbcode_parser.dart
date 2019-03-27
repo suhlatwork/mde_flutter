@@ -23,16 +23,17 @@ class _QuoteTag extends BBCodeTag {
   _QuoteTag() : super('quote');
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     if (argument != null) {
-      final int split1 = argument.indexOf(',');
-      final int split2 = argument.indexOf(',', split1 + 1);
+      final int split1 = (argument as String).indexOf(',');
+      final int split2 = (argument as String).indexOf(',', split1 + 1);
 
-      final int threadId = int.parse(argument.substring(0, split1));
-      final int postId = int.parse(argument.substring(split1 + 1, split2));
+      final int threadId = int.parse((argument as String).substring(0, split1));
+      final int postId =
+          int.parse((argument as String).substring(split1 + 1, split2));
 
-      String author = argument.substring(split2 + 1);
+      String author = (argument as String).substring(split2 + 1);
       if (author.startsWith('"') && author.endsWith('"')) {
         author = author.substring(1, author.length - 1);
       }
@@ -53,8 +54,8 @@ class _MonospaceTag extends BBCodeTag {
   _MonospaceTag() : super('m');
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     return '<pre class="inline">$innerHtml</pre>';
   }
 }
@@ -63,8 +64,8 @@ class _StrikeTag extends BBCodeTag {
   _StrikeTag() : super('s');
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     return '<span class="strike">$innerHtml</span>';
   }
 }
@@ -73,8 +74,8 @@ class _ModTag extends BBCodeTag {
   _ModTag() : super('mod');
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     return '<span class="mod">$innerHtml</span>';
   }
 }
@@ -83,8 +84,8 @@ class _SpoilerTag extends BBCodeTag {
   _SpoilerTag() : super('spoiler');
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     return '<div class="media spoiler">'
         '<i class="material-icons">&#xE8F5;</i>'
         '<button class="viewer mdl-button mdl-js-button">Spoiler zeigen</button>'
@@ -97,8 +98,8 @@ class _TriggerTag extends BBCodeTag {
   _TriggerTag() : super('trigger');
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     return '<span class="trigger">$innerHtml</span>';
   }
 }
@@ -107,8 +108,8 @@ class _CodeTag extends BBCodeTag {
   _CodeTag() : super('code', container: false);
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     return '<div class="code">$innerHtml</div>';
   }
 }
@@ -117,8 +118,8 @@ class _TexTag extends BBCodeTag {
   _TexTag() : super('tex', container: false);
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     Uri uri = Uri.https(
       'chart.googleapis.com',
       'chart',
@@ -137,8 +138,8 @@ class _ImageTag extends BBCodeTag {
   _ImageTag() : super('img', container: false);
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     String typeClass = 'img';
     String icon = '&#xE410;';
 
@@ -159,8 +160,8 @@ class _VideoTag extends BBCodeTag {
   _VideoTag() : super('video');
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     Uri uri = Uri.parse(innerHtml);
     if (uri.host == "www.youtube.com" || uri.host == "youtu.be") {
       String id;
@@ -193,11 +194,11 @@ class _UrlTag extends BBCodeTag {
   _UrlTag() : super('url');
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     String url = innerHtml;
     if (argument?.isNotEmpty ?? false) {
-      url = argument;
+      url = argument as String;
 
       if (url.startsWith('"') && url.endsWith('"')) {
         url = url.substring(1, url.length - 1);
@@ -212,8 +213,8 @@ class _UrlImageTag extends BBCodeTag {
   _UrlImageTag() : super('', container: false);
 
   @override
-  String toHtml(
-      final String argument, final String innerBBCode, final String innerHtml) {
+  String toHtml(final dynamic argument, final String innerBBCode,
+      final String innerHtml) {
     String typeClass = 'img-link';
     String icon = '&#xE410;';
 
@@ -222,7 +223,7 @@ class _UrlImageTag extends BBCodeTag {
       icon = '&#xE54D;';
     }
 
-    String url = argument;
+    String url = argument as String;
     if (url.startsWith('"') && url.endsWith('"')) {
       url = url.substring(1, url.length - 1);
     }
