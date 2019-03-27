@@ -215,20 +215,23 @@ class _UrlImageTag extends BBCodeTag {
   @override
   String toHtml(final dynamic argument, final String innerBBCode,
       final String innerHtml) {
+    final List<String> arguments = argument as List<String>;
+    String urlLink = arguments[0];
+    String urlImage = arguments[1];
+
     String typeClass = 'img-link';
     String icon = '&#xE410;';
 
-    if (innerHtml.substring(innerHtml.length - 3) == 'gif') {
+    if (urlImage.substring(urlImage.length - 3) == 'gif') {
       typeClass = 'gif-link';
       icon = '&#xE54D;';
     }
 
-    String url = argument as String;
-    if (url.startsWith('"') && url.endsWith('"')) {
-      url = url.substring(1, url.length - 1);
+    if (urlLink.startsWith('"') && urlLink.endsWith('"')) {
+      urlLink = urlLink.substring(1, urlLink.length - 1);
     }
 
-    return '<div class="media $typeClass" data-src="$innerHtml" data-href="$url">'
+    return '<div class="media $typeClass" data-src="$urlImage" data-href="$urlLink">'
         '<i class="material-icons">$icon</i>'
         '<button class="link mdl-button mdl-js-button">Link</button>'
         '<button class="inline mdl-button mdl-js-button">Inline</button>'
@@ -340,7 +343,7 @@ _processMDEBBCode(BBCodePart part) {
           _UrlImageTag(),
           currentPart.bbCode,
           secondPart.parts,
-          currentPart.argument,
+          <String>[currentPart.argument, secondPart.bbCode],
         );
 
         BBCodePart thirdPart = _processUrlImageSplitThird(currentPart);
