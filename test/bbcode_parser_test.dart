@@ -51,6 +51,14 @@ void main() {
   );
 
   test(
+    'HTML characters',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('text<br />text');
+      expect(result.toHtml(), 'text&lt;br &#47;&gt;text');
+    },
+  );
+
+  test(
     'bold tags',
     () {
       final BBCodeDocument result = bbCodeParser.parse('[b]bold text[/b]');
@@ -325,8 +333,8 @@ void main() {
     () {
       final BBCodeDocument result =
           bbCodeParser.parse('[b]bold [u]underline[/b] text[/u]');
-      expect(
-          result.toHtml(), '<strong>bold <u>underline</u></strong> text[/u]');
+      expect(result.toHtml(),
+          '<strong>bold <u>underline</u></strong> text[&#47;u]');
     },
   );
 
@@ -335,7 +343,7 @@ void main() {
     () {
       final BBCodeDocument result =
           bbCodeParser.parse('[b]bold underline[/u] text[/b]');
-      expect(result.toHtml(), '<strong>bold underline[/u] text</strong>');
+      expect(result.toHtml(), '<strong>bold underline[&#47;u] text</strong>');
     },
   );
 
@@ -384,7 +392,7 @@ void main() {
     'broken single closing bold tag at beginning',
     () {
       final BBCodeDocument result = bbCodeParser.parse('[/b]bold text');
-      expect(result.toHtml(), '[/b]bold text');
+      expect(result.toHtml(), '[&#47;b]bold text');
     },
   );
 
@@ -392,7 +400,7 @@ void main() {
     'broken single closing bold tag in the middle',
     () {
       final BBCodeDocument result = bbCodeParser.parse('text[/b] bold');
-      expect(result.toHtml(), 'text[/b] bold');
+      expect(result.toHtml(), 'text[&#47;b] bold');
     },
   );
 
@@ -400,7 +408,7 @@ void main() {
     'broken single closing bold tag at end',
     () {
       final BBCodeDocument result = bbCodeParser.parse('bold text[/b]');
-      expect(result.toHtml(), 'bold text[/b]');
+      expect(result.toHtml(), 'bold text[&#47;b]');
     },
   );
 
@@ -440,7 +448,7 @@ void main() {
     'unknown closing single tag in the middle',
     () {
       final BBCodeDocument result = bbCodeParser.parse('broken [/x] text');
-      expect(result.toHtml(), 'broken [/x] text');
+      expect(result.toHtml(), 'broken [&#47;x] text');
     },
   );
 
@@ -448,7 +456,7 @@ void main() {
     'unknown tags',
     () {
       final BBCodeDocument result = bbCodeParser.parse('[x]broken text[/x]');
-      expect(result.toHtml(), '[x]broken text[/x]');
+      expect(result.toHtml(), '[x]broken text[&#47;x]');
     },
   );
 
@@ -511,7 +519,7 @@ void main() {
       final BBCodeDocument result =
           bbCodeParser.parse('[list][*][b]item 1[*]item 2[/b][/list]');
       expect(result.toHtml(),
-          '<ul><li><strong>item 1</strong></li><li>item 2[/b]</li></ul>');
+          '<ul><li><strong>item 1</strong></li><li>item 2[&#47;b]</li></ul>');
     },
   );
 

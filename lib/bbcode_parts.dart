@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import 'dart:convert';
+
 import 'bbcode_tags.dart';
 import 'bbcode_emoji.dart';
 
@@ -62,7 +64,8 @@ class BBCodePartText extends BBCodePart {
 
   @override
   String toHtml() {
-    return (emojiParser?.toHtml(bbCode) ?? bbCode)
+    final String escapedBBCode = HtmlEscape().convert(bbCode);
+    return (emojiParser?.toHtml(escapedBBCode) ?? escapedBBCode)
         .replaceAll('\r\n', '<br />')
         .replaceAll('\n', '<br />');
   }

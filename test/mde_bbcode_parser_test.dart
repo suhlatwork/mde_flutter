@@ -52,7 +52,8 @@ void main() {
     () {
       final BBCodeDocument result =
           mdebbCodeParser.parse('[code]text in [b]bold[/b][/code]');
-      expect(result.toHtml(), '<div class="code">text in [b]bold[/b]</div>');
+      expect(
+          result.toHtml(), '<div class="code">text in [b]bold[&#47;b]</div>');
     },
   );
 
@@ -86,72 +87,121 @@ void main() {
   );
 
   test(
-    'img inside url',
+    'img',
+    () {
+      final BBCodeDocument result = mdebbCodeParser
+          .parse('[img]https://flutter.dev/images/favicon.png[/img]');
+      expect(result.toHtml(),
+          '<div class="media img" data-src="https://flutter.dev/images/favicon.png"><i class="material-icons">&#xE410;</i><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div>');
+    },
+  );
+
+  test(
+    'img with argument',
+    () {
+      final BBCodeDocument result = mdebbCodeParser
+          .parse('[img=text]https://flutter.dev/images/favicon.png[/img]');
+      expect(result.toHtml(),
+          '<div class="media img" data-src="https://flutter.dev/images/favicon.png"><i class="material-icons">&#xE410;</i><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div>');
+    },
+  );
+
+  test(
+    'url',
     () {
       final BBCodeDocument result =
-          mdebbCodeParser.parse('[url=link][img]image[/img][/url]');
+          mdebbCodeParser.parse('[url]https://flutter.dev[/url]');
       expect(result.toHtml(),
-          '<div class="media img-link" data-src="image" data-href="link"><i class="material-icons">&#xE410;</i><button class="link mdl-button mdl-js-button">Link</button><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div>');
+          '<a href="https://flutter.dev">https:&#47;&#47;flutter.dev</a>');
+    },
+  );
+
+  test(
+    'url with argument',
+    () {
+      final BBCodeDocument result =
+          mdebbCodeParser.parse('[url=https://flutter.dev]flutter[/url]');
+      expect(result.toHtml(), '<a href="https://flutter.dev">flutter</a>');
+    },
+  );
+
+  test(
+    'url without argument but nested BB code ',
+    () {
+      final BBCodeDocument result =
+          mdebbCodeParser.parse('[url]https://flutter.dev [b]text[/b][/url]');
+      expect(result.toHtml(),
+          '<strong>Ungültiger Link:<strong> &quot;https:&#47;&#47;flutter.dev [b]text[&#47;b]&quot;');
+    },
+  );
+
+  test(
+    'img inside url',
+    () {
+      final BBCodeDocument result = mdebbCodeParser.parse(
+          '[url=https://flutter.dev][img]https://flutter.dev/images/favicon.png[/img][/url]');
+      expect(result.toHtml(),
+          '<div class="media img-link" data-src="https://flutter.dev/images/favicon.png" data-href="https://flutter.dev"><i class="material-icons">&#xE410;</i><button class="link mdl-button mdl-js-button">Link</button><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div>');
     },
   );
 
   test(
     'text and img inside url',
     () {
-      final BBCodeDocument result =
-          mdebbCodeParser.parse('[url=link]text [img]image[/img] text[/url]');
+      final BBCodeDocument result = mdebbCodeParser.parse(
+          '[url=https://flutter.dev]text [img]https://flutter.dev/images/favicon.png[/img] text[/url]');
       expect(result.toHtml(),
-          '<a href="link">text </a><div class="media img-link" data-src="image" data-href="link"><i class="material-icons">&#xE410;</i><button class="link mdl-button mdl-js-button">Link</button><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div><a href="link"> text</a>');
+          '<a href="https://flutter.dev">text </a><div class="media img-link" data-src="https://flutter.dev/images/favicon.png" data-href="https://flutter.dev"><i class="material-icons">&#xE410;</i><button class="link mdl-button mdl-js-button">Link</button><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div><a href="https://flutter.dev"> text</a>');
     },
   );
 
   test(
     'left text and img inside url',
     () {
-      final BBCodeDocument result =
-          mdebbCodeParser.parse('[url=link]text [img]image[/img][/url]');
+      final BBCodeDocument result = mdebbCodeParser.parse(
+          '[url=https://flutter.dev]text [img]https://flutter.dev/images/favicon.png[/img][/url]');
       expect(result.toHtml(),
-          '<a href="link">text </a><div class="media img-link" data-src="image" data-href="link"><i class="material-icons">&#xE410;</i><button class="link mdl-button mdl-js-button">Link</button><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div>');
+          '<a href="https://flutter.dev">text </a><div class="media img-link" data-src="https://flutter.dev/images/favicon.png" data-href="https://flutter.dev"><i class="material-icons">&#xE410;</i><button class="link mdl-button mdl-js-button">Link</button><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div>');
     },
   );
 
   test(
     'right text and img inside url',
     () {
-      final BBCodeDocument result =
-          mdebbCodeParser.parse('[url=link][img]image[/img] text[/url]');
+      final BBCodeDocument result = mdebbCodeParser.parse(
+          '[url=https://flutter.dev][img]https://flutter.dev/images/favicon.png[/img] text[/url]');
       expect(result.toHtml(),
-          '<div class="media img-link" data-src="image" data-href="link"><i class="material-icons">&#xE410;</i><button class="link mdl-button mdl-js-button">Link</button><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div><a href="link"> text</a>');
+          '<div class="media img-link" data-src="https://flutter.dev/images/favicon.png" data-href="https://flutter.dev"><i class="material-icons">&#xE410;</i><button class="link mdl-button mdl-js-button">Link</button><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div><a href="https://flutter.dev"> text</a>');
     },
   );
 
   test(
     'bold text and img inside url',
     () {
-      final BBCodeDocument result = mdebbCodeParser
-          .parse('[url=link][b]bold text [img]image[/img] bold text[/b][/url]');
+      final BBCodeDocument result = mdebbCodeParser.parse(
+          '[url=https://flutter.dev][b]bold text [img]https://flutter.dev/images/favicon.png[/img] bold text[/b][/url]');
       expect(result.toHtml(),
-          '<a href="link"><strong>bold text </strong></a><div class="media img-link" data-src="image" data-href="link"><i class="material-icons">&#xE410;</i><button class="link mdl-button mdl-js-button">Link</button><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div><a href="link"><strong> bold text</strong></a>');
+          '<a href="https://flutter.dev"><strong>bold text </strong></a><div class="media img-link" data-src="https://flutter.dev/images/favicon.png" data-href="https://flutter.dev"><i class="material-icons">&#xE410;</i><button class="link mdl-button mdl-js-button">Link</button><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div><a href="https://flutter.dev"><strong> bold text</strong></a>');
     },
   );
 
   test(
     'bold left text and img inside url',
     () {
-      final BBCodeDocument result = mdebbCodeParser
-          .parse('[url=link][b]bold text [img]image[/img][/b][/url]');
+      final BBCodeDocument result = mdebbCodeParser.parse(
+          '[url=https://flutter.dev][b]bold text [img]https://flutter.dev/images/favicon.png[/img][/b][/url]');
       expect(result.toHtml(),
-          '<a href="link"><strong>bold text </strong></a><div class="media img-link" data-src="image" data-href="link"><i class="material-icons">&#xE410;</i><button class="link mdl-button mdl-js-button">Link</button><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div>');
+          '<a href="https://flutter.dev"><strong>bold text </strong></a><div class="media img-link" data-src="https://flutter.dev/images/favicon.png" data-href="https://flutter.dev"><i class="material-icons">&#xE410;</i><button class="link mdl-button mdl-js-button">Link</button><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div>');
     },
   );
 
   test(
     'bold right text and img inside url',
     () {
-      final BBCodeDocument result = mdebbCodeParser
-          .parse('[url=link][b][img]image[/img] bold text[/b][/url]');
+      final BBCodeDocument result = mdebbCodeParser.parse(
+          '[url=https://flutter.dev][b][img]https://flutter.dev/images/favicon.png[/img] bold text[/b][/url]');
       expect(result.toHtml(),
-          '<div class="media img-link" data-src="image" data-href="link"><i class="material-icons">&#xE410;</i><button class="link mdl-button mdl-js-button">Link</button><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div><a href="link"><strong> bold text</strong></a>');
+          '<div class="media img-link" data-src="https://flutter.dev/images/favicon.png" data-href="https://flutter.dev"><i class="material-icons">&#xE410;</i><button class="link mdl-button mdl-js-button">Link</button><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div><a href="https://flutter.dev"><strong> bold text</strong></a>');
     },
   );
 
@@ -159,9 +209,9 @@ void main() {
     'formatted text around img inside url',
     () {
       final BBCodeDocument result = mdebbCodeParser.parse(
-          '[url=link][b]bold text[/b] [img]image[/img] [u]underlined text[/u][/url]');
+          '[url=https://flutter.dev][b]bold text[/b] [img]https://flutter.dev/images/favicon.png[/img] [u]underlined text[/u][/url]');
       expect(result.toHtml(),
-          '<a href="link"><strong>bold text</strong> </a><div class="media img-link" data-src="image" data-href="link"><i class="material-icons">&#xE410;</i><button class="link mdl-button mdl-js-button">Link</button><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div><a href="link"> <u>underlined text</u></a>');
+          '<a href="https://flutter.dev"><strong>bold text</strong> </a><div class="media img-link" data-src="https://flutter.dev/images/favicon.png" data-href="https://flutter.dev"><i class="material-icons">&#xE410;</i><button class="link mdl-button mdl-js-button">Link</button><button class="inline mdl-button mdl-js-button">Inline</button><button class="viewer mdl-button mdl-js-button">Viewer</button></div><a href="https://flutter.dev"> <u>underlined text</u></a>');
     },
   );
 

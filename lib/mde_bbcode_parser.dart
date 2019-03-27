@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import 'dart:convert';
+
 import 'bbcode_parser.dart';
 export 'bbcode_parser.dart';
 
@@ -37,6 +39,7 @@ class _QuoteTag extends BBCodeTag {
       if (author.startsWith('"') && author.endsWith('"')) {
         author = author.substring(1, author.length - 1);
       }
+      author = HtmlEscape().convert(author);
 
       return '<div class="quote">'
           '<a href="http://forum.mods.de/bb/thread.php?TID=$threadId&PID=$postId" class="author">'
@@ -127,7 +130,7 @@ class _TexTag extends BBCodeTag {
         'chco': 'ffffff',
         'chf': 'bg,s,394E63',
         'cht': 'tx',
-        'chl': innerHtml,
+        'chl': innerBBCode,
       },
     );
     return '<img src="$uri" class="tex" />';
@@ -143,12 +146,18 @@ class _ImageTag extends BBCodeTag {
     String typeClass = 'img';
     String icon = '&#xE410;';
 
-    if (innerHtml.substring(argument.length - 3) == 'gif') {
+    Uri url = Uri.tryParse(innerBBCode);
+    if (url == null) {
+      final String text = HtmlEscape().convert(innerBBCode);
+      return '<strong>Ungültige Bildaddresse:<strong> &quot;$text&quot;';
+    }
+
+    if (url.path.endsWith('gif')) {
       typeClass = 'gif';
       icon = '&#xE54D;';
     }
 
-    return '<div class="media $typeClass" data-src="$innerHtml">'
+    return '<div class="media $typeClass" data-src="${url.toString()}">'
         '<i class="material-icons">$icon</i>'
         '<button class="inline mdl-button mdl-js-button">Inline</button>'
         '<button class="viewer mdl-button mdl-js-button">Viewer</button>'
@@ -162,7 +171,12 @@ class _VideoTag extends BBCodeTag {
   @override
   String toHtml(final dynamic argument, final String innerBBCode,
       final String innerHtml) {
-    Uri uri = Uri.parse(innerHtml);
+    Uri uri = Uri.tryParse(innerBBCode);
+    if (uri == null) {
+      final String text = HtmlEscape().convert(innerBBCode);
+      return '<strong>Ungültiger Link:<strong> &quot;$text&quot;';
+    }
+
     if (uri.host == "www.youtube.com" || uri.host == "youtu.be") {
       String id;
       if (uri.host == "www.youtube.com") {
@@ -196,13 +210,28 @@ class _UrlTag extends BBCodeTag {
   @override
   String toHtml(final dynamic argument, final String innerBBCode,
       final String innerHtml) {
-    String url = innerHtml;
-    if (argument?.isNotEmpty ?? false) {
-      url = argument as String;
+    if (argument == null) {
+      final String url = innerBBCode;
+      final Uri uri = Uri.tryParse(url);
 
-      if (url.startsWith('"') && url.endsWith('"')) {
-        url = url.substring(1, url.length - 1);
+      final String text = HtmlEscape().convert(url);
+
+      if (uri == null) {
+        return '<strong>Ungültiger Link:<strong> &quot;$text&quot;';
       }
+
+      return '<a href="${uri.toString()}">$text</a>';
+    }
+
+    String url = argument as String;
+    if (url.startsWith('"') && url.endsWith('"')) {
+      url = url.substring(1, url.length - 1);
+    }
+    final Uri uri = Uri.tryParse(url);
+
+    if (uri == null) {
+      final String text = HtmlEscape().convert(url);
+      return '<strong>Ungültiger Link:<strong> &quot;$text&quot; mit Text &quot;$innerHtml&quot;';
     }
 
     return '<a href="$url">$innerHtml</a>';
@@ -216,22 +245,32 @@ class _UrlImageTag extends BBCodeTag {
   String toHtml(final dynamic argument, final String innerBBCode,
       final String innerHtml) {
     final List<String> arguments = argument as List<String>;
-    String urlLink = arguments[0];
-    String urlImage = arguments[1];
+    if (arguments[0].startsWith('"') && arguments[0].endsWith('"')) {
+      arguments[0] = arguments[0].substring(1, arguments[0].length - 1);
+    }
+
+    Uri urlLink = Uri.tryParse(arguments[0]);
+    Uri urlImage = Uri.tryParse(arguments[1]);
+
+    if (urlLink == null) {
+      final String text = HtmlEscape().convert(arguments[0]);
+      return '<strong>Ungültiger Link:<strong> &quot;$text&quot;';
+    }
+
+    if (urlImage == null) {
+      final String text = HtmlEscape().convert(arguments[1]);
+      return '<strong>Ungültige Bildaddresse:<strong> &quot;$text&quot;';
+    }
 
     String typeClass = 'img-link';
     String icon = '&#xE410;';
 
-    if (urlImage.substring(urlImage.length - 3) == 'gif') {
+    if (urlImage.path.endsWith('gif')) {
       typeClass = 'gif-link';
       icon = '&#xE54D;';
     }
 
-    if (urlLink.startsWith('"') && urlLink.endsWith('"')) {
-      urlLink = urlLink.substring(1, urlLink.length - 1);
-    }
-
-    return '<div class="media $typeClass" data-src="$urlImage" data-href="$urlLink">'
+    return '<div class="media $typeClass" data-src="${urlImage.toString()}" data-href="${urlLink.toString()}">'
         '<i class="material-icons">$icon</i>'
         '<button class="link mdl-button mdl-js-button">Link</button>'
         '<button class="inline mdl-button mdl-js-button">Inline</button>'
