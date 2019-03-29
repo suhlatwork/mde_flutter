@@ -26,11 +26,23 @@ import 'mde_account.dart';
 
 class MainDrawer extends StatefulWidget {
   final Completer<WebViewController> controllerCompleter;
+  final Future<bool> _canNavigateBack;
+  final Future<bool> _canNavigateForward;
+  final Future<String> _userName;
+  final Future<List<BookmarkItem>> _bookmarkList;
+  final Future<PackageInfo> _packageInfo;
 
-  const MainDrawer({
+  MainDrawer({
     Key key,
     @required this.controllerCompleter,
-  }) : super(key: key);
+  })  : _canNavigateBack = controllerCompleter.future
+            .then((controller) => controller.canGoBack()),
+        _canNavigateForward = controllerCompleter.future
+            .then((controller) => controller.canGoForward()),
+        _userName = MDEAccount.userName(),
+        _bookmarkList = Bookmarks().bookmarkListCompleter.future,
+        _packageInfo = PackageInfo.fromPlatform(),
+        super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MainDrawerState();
@@ -38,10 +50,15 @@ class MainDrawer extends StatefulWidget {
 
 class _MainDrawerState extends State<MainDrawer> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Drawer(
       child: FutureBuilder(
-        future: Bookmarks().bookmarkListCompleter.future,
+        future: widget._bookmarkList,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           List<Widget> children = [
             ListTile(
@@ -69,8 +86,7 @@ class _MainDrawerState extends State<MainDrawer> {
                     },
                   ),
                   FutureBuilder(
-                    future: widget.controllerCompleter.future
-                        .then((controller) => controller.canGoBack()),
+                    future: widget._canNavigateBack,
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
                       if (snapshot.connectionState == ConnectionState.done &&
                           snapshot.data) {
@@ -89,8 +105,7 @@ class _MainDrawerState extends State<MainDrawer> {
                     },
                   ),
                   FutureBuilder(
-                    future: widget.controllerCompleter.future
-                        .then((controller) => controller.canGoForward()),
+                    future: widget._canNavigateForward,
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
                       if (snapshot.connectionState == ConnectionState.done &&
                           snapshot.data) {
@@ -114,7 +129,7 @@ class _MainDrawerState extends State<MainDrawer> {
             ),
             Divider(),
             FutureBuilder(
-              future: MDEAccount.userName(),
+              future: widget._userName,
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (snapshot.data != null) {
@@ -166,109 +181,111 @@ class _MainDrawerState extends State<MainDrawer> {
                 );
               },
             ),
+            Divider(),
           ];
 
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.data.isNotEmpty) {
-              children.add(Divider());
-              children.addAll(
-                snapshot.data.where((BookmarkItem item) {
-                  return item.unreadPosts != 0;
-                }).map<Widget>((BookmarkItem item) {
-                  return ListTile(
-                      onLongPress: () async {
-                        final bool remove = await showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text('Lesezeichen entfernen'),
-                              content: Text(
-                                  'Soll das Lesezeichen für den Thread "${item.threadTitle}" wirklich entfernt werden?'),
-                              actions: <Widget>[
-                                FlatButton(
-                                  child: Text('Behalten'),
-                                  onPressed: () {
-                                    Navigator.pop(context, false);
-                                  },
-                                ),
-                                FlatButton(
-                                  child: Text('Entfernen'),
-                                  onPressed: () {
-                                    Navigator.pop(context, true);
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-
-                        if (remove ?? false) {
-                          await MDEAccount.removeBookmark(
-                            bookmarkId: item.bookmarkId,
-                            removeBookmarkToken: item.removeBookmarkToken,
+              List<Widget> entries = snapshot.data.where((BookmarkItem item) {
+                return ((item.unreadPosts != 0) || (item.threadClosed == true));
+              }).map<Widget>((BookmarkItem item) {
+                return ListTile(
+                    onLongPress: () async {
+                      final bool remove = await showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Lesezeichen entfernen'),
+                            content: Text(
+                                'Soll das Lesezeichen für den Thread "${item.threadTitle}" wirklich entfernt werden?'),
+                            actions: <Widget>[
+                              FlatButton(
+                                child: Text('Behalten'),
+                                onPressed: () {
+                                  Navigator.pop(context, false);
+                                },
+                              ),
+                              FlatButton(
+                                child: Text('Entfernen'),
+                                onPressed: () {
+                                  Navigator.pop(context, true);
+                                },
+                              ),
+                            ],
                           );
-                          // update bookmark list
-                          setState(() {});
-                        }
-                      },
-                      onTap: () async {
-                        final Uri uri = Uri.http('', '').replace(
-                          host: InternetAddress.loopbackIPv6.host,
-                          path: '/thread',
-                          port: await HttpServerWrapper.port.future,
-                          queryParameters: {
-                            'TID': item.threadId.toString(),
-                            'PID': item.postId.toString(),
-                          },
+                        },
+                      );
+
+                      if (remove ?? false) {
+                        await MDEAccount.removeBookmark(
+                          bookmarkId: item.bookmarkId,
+                          removeBookmarkToken: item.removeBookmarkToken,
                         );
-                        (await widget.controllerCompleter.future)
-                            .loadUrl(uri.toString());
-                        Navigator.pop(context);
-                      },
-                      title: Text(
-                        item.threadTitle,
-                        overflow: TextOverflow.ellipsis,
-                        style: item.threadClosed
-                            ? TextStyle(decoration: TextDecoration.lineThrough)
-                            : TextStyle(),
-                      ),
-                      trailing: Text(
-                        item.unreadPosts.toString(),
-                      ));
-                }),
-              );
+                        // update bookmark list
+                        setState(() {});
+                      }
+                    },
+                    onTap: () async {
+                      final Uri uri = Uri.http('', '').replace(
+                        host: InternetAddress.loopbackIPv6.host,
+                        path: '/thread',
+                        port: await HttpServerWrapper.port.future,
+                        queryParameters: {
+                          'TID': item.threadId.toString(),
+                          'PID': item.postId.toString(),
+                        },
+                      );
+                      (await widget.controllerCompleter.future)
+                          .loadUrl(uri.toString());
+                      Navigator.pop(context);
+                    },
+                    title: Text(
+                      item.threadTitle,
+                      overflow: TextOverflow.ellipsis,
+                      style: item.threadClosed
+                          ? TextStyle(decoration: TextDecoration.lineThrough)
+                          : TextStyle(),
+                    ),
+                    trailing: ((item.unreadPosts > 0)
+                        ? Text(
+                            item.unreadPosts.toString(),
+                          )
+                        : null));
+              }).toList();
+
+              if (entries.length > 0) {
+                children.addAll(entries);
+                children.add(Divider());
+              }
             }
           } else {
             children.addAll(
               <Widget>[
-                Divider(),
                 Center(
                   child: CircularProgressIndicator(),
                 ),
+                Divider(),
               ],
             );
           }
 
-          children.addAll(
-            <Widget>[
-              Divider(),
-              FutureBuilder(
-                future: PackageInfo.fromPlatform(),
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return AboutListTile(
-                      applicationName: snapshot.data.appName,
-                      applicationVersion: snapshot.data.version,
-                    );
-                  }
-
-                  return Center(
-                    child: CircularProgressIndicator(),
+          children.add(
+            FutureBuilder(
+              future: widget._packageInfo,
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return AboutListTile(
+                    applicationName: snapshot.data.appName,
+                    applicationVersion: snapshot.data.version,
                   );
-                },
-              ),
-            ],
+                }
+
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
+            ),
           );
 
           return ListView(
