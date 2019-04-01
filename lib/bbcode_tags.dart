@@ -29,6 +29,10 @@ abstract class BBCodeTag {
 
   String toHtml(
       final dynamic argument, final String innerBBCode, final String innerHtml);
+
+  String toBBCode(final dynamic argument, final String innerBBCode) {
+    return '[$bbTag]$innerBBCode[/$bbTag]';
+  }
 }
 
 class BBCodeBoldTag extends BBCodeTag {
@@ -77,6 +81,18 @@ class BBCodeListTag extends BBCodeTag {
 
     return '<ul>$innerHtml</ul>';
   }
+
+  String toBBCode(final dynamic argument, final String innerBBCode) {
+    String type = '';
+    if (argument as String == '1') {
+      type = '=1';
+    }
+    if (argument as String == 'a') {
+      type = '=a';
+    }
+
+    return '[$bbTag$type]\n$innerBBCode[/$bbTag]';
+  }
 }
 
 class BBCodeListItemTag extends BBCodeTag {
@@ -86,6 +102,10 @@ class BBCodeListItemTag extends BBCodeTag {
   String toHtml(final dynamic argument, final String innerBBCode,
       final String innerHtml) {
     return '<li>$innerHtml</li>';
+  }
+
+  String toBBCode(final dynamic argument, final String innerBBCode) {
+    return '[$bbTag]$innerBBCode\n';
   }
 }
 
@@ -103,6 +123,21 @@ class BBCodeTableTag extends BBCodeTag {
     }
     return '<table$style>$innerHtml</table>';
   }
+
+  String toBBCode(final dynamic argument, final String innerBBCode) {
+    // remove first '[--]\n'
+    if (innerBBCode.substring(0, 5) != '[${requiredChild.bbTag}]\n') {
+      throw Error();
+    }
+
+    String style = '';
+    if (argument != null && (argument as String).startsWith('border=')) {
+      final int border = int.parse((argument as String).substring(7));
+      style = ' border=$border';
+    }
+
+    return '[$bbTag$style]\n${innerBBCode.substring(5)}\n[/$bbTag]';
+  }
 }
 
 class BBCodeTableRowTag extends BBCodeTag {
@@ -117,6 +152,15 @@ class BBCodeTableRowTag extends BBCodeTag {
       final String innerHtml) {
     return '<tr>$innerHtml</tr>';
   }
+
+  String toBBCode(final dynamic argument, final String innerBBCode) {
+    // remove first '[||]'
+    if (innerBBCode.substring(0, 4) != '[${requiredChild.bbTag}]') {
+      throw Error();
+    }
+
+    return '[$bbTag]\n${innerBBCode.substring(4)}';
+  }
 }
 
 class BBCodeTableColumnTag extends BBCodeTag {
@@ -126,5 +170,9 @@ class BBCodeTableColumnTag extends BBCodeTag {
   String toHtml(final dynamic argument, final String innerBBCode,
       final String innerHtml) {
     return '<td>$innerHtml</td>';
+  }
+
+  String toBBCode(final dynamic argument, final String innerBBCode) {
+    return '[$bbTag]$innerBBCode';
   }
 }

@@ -51,6 +51,16 @@ class _QuoteTag extends BBCodeTag {
 
     return '<div class="quote"><div class="content">$innerHtml</div></div>';
   }
+
+  @override
+  String toBBCode(final dynamic argument, final String innerBBCode) {
+    String reference = '';
+    if (argument != null) {
+      reference = '=$argument';
+    }
+
+    return '[$bbTag$reference]$innerBBCode[/$bbTag]';
+  }
 }
 
 class _MonospaceTag extends BBCodeTag {
@@ -235,6 +245,16 @@ class _UrlTag extends BBCodeTag {
     }
 
     return '<a href="$url">$innerHtml</a>';
+  }
+
+  @override
+  String toBBCode(final dynamic argument, final String innerBBCode) {
+    String url = '';
+    if (argument != null) {
+      url = '=$argument';
+    }
+
+    return '[$bbTag$url]$innerBBCode[/$bbTag]';
   }
 }
 

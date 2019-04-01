@@ -49,6 +49,18 @@ class BBCodePart<T extends BBCodeTag> {
       ),
     );
   }
+
+  String toBBCode() {
+    return tag.toBBCode(
+      argument,
+      parts.fold(
+        '',
+        (prev, element) {
+          return prev + element.toBBCode();
+        },
+      ),
+    );
+  }
 }
 
 class BBCodePartText extends BBCodePart {
@@ -68,6 +80,11 @@ class BBCodePartText extends BBCodePart {
     return (emojiParser?.toHtml(escapedBBCode) ?? escapedBBCode)
         .replaceAll('\r\n', '<br />')
         .replaceAll('\n', '<br />');
+  }
+
+  @override
+  String toBBCode() {
+    return bbCode;
   }
 }
 
@@ -106,6 +123,16 @@ class BBCodeDocument extends BBCodePart {
       '',
       (prev, element) {
         return prev + element.toHtml();
+      },
+    );
+  }
+
+  @override
+  String toBBCode() {
+    return parts.fold(
+      '',
+      (prev, element) {
+        return prev + element.toBBCode();
       },
     );
   }

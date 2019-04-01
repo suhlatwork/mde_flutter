@@ -87,6 +87,16 @@ void main() {
   );
 
   test(
+    'quote with reference',
+    () {
+      final BBCodeDocument result =
+          mdebbCodeParser.parse('[quote=1,1,"[CSF]Omega"][b]text[/b][/quote]');
+      expect(result.toHtml(),
+          '<div class="quote"><a href="http://forum.mods.de/bb/thread.php?TID=1&PID=1" class="author"><i class="material-icons">&#xE244;</i>[CSF]Omega</a><div class="content">text</div></div>');
+    },
+  );
+
+  test(
     'img',
     () {
       final BBCodeDocument result = mdebbCodeParser
@@ -242,6 +252,232 @@ void main() {
           .parse('[video]https://www.youtube.com/embed/fq4N0hgOWzU[/video]');
       expect(result.toHtml(),
           '<div class="media video yt" data-id="fq4N0hgOWzU"><i class="material-icons">&#xE02C;</i><button class="inline mdl-button mdl-js-button">Inline</button><button class="link mdl-button mdl-js-button">Youtube</button></div>');
+    },
+  );
+
+  test(
+    'no container tag',
+    () {
+      final BBCodeDocument result = mdebbCodeParser.parse('[code]text[/code]');
+      expect(result.toBBCode(), '[code]text[/code]');
+    },
+  );
+
+  test(
+    'no container tag missing closing',
+    () {
+      final BBCodeDocument result = mdebbCodeParser.parse('[code]text');
+      expect(result.toBBCode(), '[code]text[/code]');
+    },
+  );
+
+  test(
+    'no container tag in bold',
+    () {
+      final BBCodeDocument result =
+          mdebbCodeParser.parse('[b]bold [code]text[/b]');
+      expect(result.toBBCode(), '[b]bold [code]text[/code][/b]');
+    },
+  );
+
+  test(
+    'bold in no container tag',
+    () {
+      final BBCodeDocument result =
+          mdebbCodeParser.parse('[code]text in [b]bold[/b][/code]');
+      expect(result.toBBCode(), '[code]text in [b]bold[/b][/code]');
+    },
+  );
+
+  test(
+    'broken bold in no container tag',
+    () {
+      final BBCodeDocument result =
+          mdebbCodeParser.parse('[code]text in [b]bold[/code]');
+      expect(result.toBBCode(), '[code]text in [b]bold[/code]');
+    },
+  );
+
+  test(
+    'bold tag inside quote',
+    () {
+      final BBCodeDocument result =
+          mdebbCodeParser.parse('[quote][b]text[/b][/quote]');
+      expect(result.toBBCode(), '[quote][b]text[/b][/quote]');
+    },
+  );
+
+  test(
+    'bold tag inside quote with bold text',
+    () {
+      final BBCodeDocument result =
+          mdebbCodeParser.parse('[quote][b]text in [b]bold[/b][/b][/quote]');
+      expect(result.toBBCode(), '[quote][b]text in [b]bold[/b][/b][/quote]');
+    },
+  );
+
+  test(
+    'quote with reference',
+    () {
+      final BBCodeDocument result =
+          mdebbCodeParser.parse('[quote=1,1,"[CSF]Omega"][b]text[/b][/quote]');
+      expect(result.toBBCode(), '[quote=1,1,"[CSF]Omega"][b]text[/b][/quote]');
+    },
+  );
+
+  test(
+    'img',
+    () {
+      final BBCodeDocument result = mdebbCodeParser
+          .parse('[img]https://flutter.dev/images/favicon.png[/img]');
+      expect(result.toBBCode(),
+          '[img]https://flutter.dev/images/favicon.png[/img]');
+    },
+  );
+
+  test(
+    'img with argument',
+    () {
+      final BBCodeDocument result = mdebbCodeParser
+          .parse('[img=text]https://flutter.dev/images/favicon.png[/img]');
+      expect(result.toBBCode(),
+          '[img]https://flutter.dev/images/favicon.png[/img]');
+    },
+  );
+
+  test(
+    'url',
+    () {
+      final BBCodeDocument result =
+          mdebbCodeParser.parse('[url]https://flutter.dev[/url]');
+      expect(result.toBBCode(), '[url]https://flutter.dev[/url]');
+    },
+  );
+
+  test(
+    'url with argument',
+    () {
+      final BBCodeDocument result =
+          mdebbCodeParser.parse('[url=https://flutter.dev]flutter[/url]');
+      expect(result.toBBCode(), '[url=https://flutter.dev]flutter[/url]');
+    },
+  );
+
+  test(
+    'url without argument but nested BB code ',
+    () {
+      final BBCodeDocument result =
+          mdebbCodeParser.parse('[url]https://flutter.dev [b]text[/b][/url]');
+      expect(result.toBBCode(), '[url]https://flutter.dev [b]text[/b][/url]');
+    },
+  );
+
+  test(
+    'img inside url',
+    () {
+      final BBCodeDocument result = mdebbCodeParser.parse(
+          '[url=https://flutter.dev][img]https://flutter.dev/images/favicon.png[/img][/url]');
+      expect(result.toBBCode(),
+          '[url=https://flutter.dev][img]https://flutter.dev/images/favicon.png[/img][/url]');
+    },
+  );
+
+  test(
+    'text and img inside url',
+    () {
+      final BBCodeDocument result = mdebbCodeParser.parse(
+          '[url=https://flutter.dev]text [img]https://flutter.dev/images/favicon.png[/img] text[/url]');
+      expect(result.toBBCode(),
+          '[url=https://flutter.dev]text [img]https://flutter.dev/images/favicon.png[/img] text[/url]');
+    },
+  );
+
+  test(
+    'left text and img inside url',
+    () {
+      final BBCodeDocument result = mdebbCodeParser.parse(
+          '[url=https://flutter.dev]text [img]https://flutter.dev/images/favicon.png[/img][/url]');
+      expect(result.toBBCode(),
+          '[url=https://flutter.dev]text [img]https://flutter.dev/images/favicon.png[/img][/url]');
+    },
+  );
+
+  test(
+    'right text and img inside url',
+    () {
+      final BBCodeDocument result = mdebbCodeParser.parse(
+          '[url=https://flutter.dev][img]https://flutter.dev/images/favicon.png[/img] text[/url]');
+      expect(result.toBBCode(),
+          '[url=https://flutter.dev][img]https://flutter.dev/images/favicon.png[/img] text[/url]');
+    },
+  );
+
+  test(
+    'bold text and img inside url',
+    () {
+      final BBCodeDocument result = mdebbCodeParser.parse(
+          '[url=https://flutter.dev][b]bold text [img]https://flutter.dev/images/favicon.png[/img] bold text[/b][/url]');
+      expect(result.toBBCode(),
+          '[url=https://flutter.dev][b]bold text [img]https://flutter.dev/images/favicon.png[/img] bold text[/b][/url]');
+    },
+  );
+
+  test(
+    'bold left text and img inside url',
+    () {
+      final BBCodeDocument result = mdebbCodeParser.parse(
+          '[url=https://flutter.dev][b]bold text [img]https://flutter.dev/images/favicon.png[/img][/b][/url]');
+      expect(result.toBBCode(),
+          '[url=https://flutter.dev][b]bold text [img]https://flutter.dev/images/favicon.png[/img][/b][/url]');
+    },
+  );
+
+  test(
+    'bold right text and img inside url',
+    () {
+      final BBCodeDocument result = mdebbCodeParser.parse(
+          '[url=https://flutter.dev][b][img]https://flutter.dev/images/favicon.png[/img] bold text[/b][/url]');
+      expect(result.toBBCode(),
+          '[url=https://flutter.dev][b][img]https://flutter.dev/images/favicon.png[/img] bold text[/b][/url]');
+    },
+  );
+
+  test(
+    'formatted text around img inside url',
+    () {
+      final BBCodeDocument result = mdebbCodeParser.parse(
+          '[url=https://flutter.dev][b]bold text[/b] [img]https://flutter.dev/images/favicon.png[/img] [u]underlined text[/u][/url]');
+      expect(result.toBBCode(),
+          '[url=https://flutter.dev][b]bold text[/b] [img]https://flutter.dev/images/favicon.png[/img] [u]underlined text[/u][/url]');
+    },
+  );
+
+  test(
+    'YouTube long URL',
+    () {
+      final BBCodeDocument result = mdebbCodeParser
+          .parse('[video]https://www.youtube.com/watch?v=fq4N0hgOWzU[/video]');
+      expect(result.toBBCode(),
+          '[video]https://www.youtube.com/watch?v=fq4N0hgOWzU[/video]');
+    },
+  );
+
+  test(
+    'YouTube short URL',
+    () {
+      final BBCodeDocument result =
+          mdebbCodeParser.parse('[video]https://youtu.be/fq4N0hgOWzU[/video]');
+      expect(result.toBBCode(), '[video]https://youtu.be/fq4N0hgOWzU[/video]');
+    },
+  );
+
+  test(
+    'YouTube embedded URL',
+    () {
+      final BBCodeDocument result = mdebbCodeParser
+          .parse('[video]https://www.youtube.com/embed/fq4N0hgOWzU[/video]');
+      expect(result.toBBCode(),
+          '[video]https://www.youtube.com/embed/fq4N0hgOWzU[/video]');
     },
   );
 }

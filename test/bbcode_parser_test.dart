@@ -657,4 +657,657 @@ void main() {
           '<table style="--border: 0px;"><tr><td>a</td><td>b</td></tr><tr><td>c</td><td>d</td></tr></table>');
     },
   );
+
+  test(
+    'text',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('text');
+      expect(result.toBBCode(), 'text');
+    },
+  );
+
+  test(
+    'HTML characters',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('text<br />text');
+      expect(result.toBBCode(), 'text<br />text');
+    },
+  );
+
+  test(
+    'bold tags',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('[b]bold text[/b]');
+      expect(result.toBBCode(), '[b]bold text[/b]');
+    },
+  );
+
+  test(
+    'bold tags with leading text',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('text [b]bold text[/b]');
+      expect(result.toBBCode(), 'text [b]bold text[/b]');
+    },
+  );
+
+  test(
+    'bold tags with trailing text',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('[b]bold text[/b] text');
+      expect(result.toBBCode(), '[b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with surrounding text',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with argument',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b=123]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with two arguments',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b=123,456]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with quoted argument',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b="[csf]"]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with two quoted argument',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b="[ff]","[vv]"]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with number and quoted argument',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b=123,"[vv]"]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with quoted and numbered argument',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b="[vv]",123]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with two quoted and one numbered argument',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b="[vv]",123,"[ff]"]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with one quoted and two numbered argument',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b=456,"[vv]",123]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with argument in closing',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b]bold text[/b=456] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with named argument without value',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b a]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with named argument',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b a=123]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with two named arguments',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b a=123,b=456]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with two named arguments without values',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b a,b]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with quoted named argument',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b a="[csf]"]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with two quoted named argument',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b a="[ff]",b="[vv]"]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with number and quoted named argument',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b a=123,b="[vv]"]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with quoted and numbered named argument',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b a="[vv]",b=123]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with two quoted and one numbered named argument',
+    () {
+      final BBCodeDocument result = bbCodeParser
+          .parse('text [b a="[vv]",b=123,c="[ff]"]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with one quoted and two numbered named argument',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b a=456,b="[vv]",c=123]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with one quoted and two numbered named argument partially without values',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b a,b="[vv]",c]bold text[/b] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'bold tags with named argument in closing',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('text [b]bold text[/b a=456] text');
+      expect(result.toBBCode(), 'text [b]bold text[/b] text');
+    },
+  );
+
+  test(
+    'two bold tags',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('[b]bold text[/b] text [b]bold text[/b]');
+      expect(result.toBBCode(), '[b]bold text[/b] text [b]bold text[/b]');
+    },
+  );
+
+  test(
+    'two neighboring bold tags',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('[b]bold text[/b][b]bold text[/b]');
+      expect(result.toBBCode(), '[b]bold text[/b][b]bold text[/b]');
+    },
+  );
+
+  test(
+    'nested bold tags',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('[b]bold [b]again[/b] text[/b]');
+      expect(result.toBBCode(), '[b]bold [b]again[/b] text[/b]');
+    },
+  );
+
+  test(
+    'bold and underline tags',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('[b]bold[/b] [u]underline[/u] text');
+      expect(result.toBBCode(), '[b]bold[/b] [u]underline[/u] text');
+    },
+  );
+
+  test(
+    'nested bold and underline tags',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('[b]bold [u]underline[/u] bold[/b]');
+      expect(result.toBBCode(), '[b]bold [u]underline[/u] bold[/b]');
+    },
+  );
+
+  test(
+    'broken nested bold and underline tags',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('[b]bold [u]underline[/b] text[/u]');
+      expect(result.toBBCode(), '[b]bold [u]underline[/u][/b] text[/u]');
+    },
+  );
+
+  test(
+    'bold with nested closing underline tags',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('[b]bold underline[/u] text[/b]');
+      expect(result.toBBCode(), '[b]bold underline[/u] text[/b]');
+    },
+  );
+
+  test(
+    'bold and nested broken underline tags',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('[b]bold [u]underline text[/b]');
+      expect(result.toBBCode(), '[b]bold [u]underline text[/u][/b]');
+    },
+  );
+
+  test(
+    'broken single bold tag at beginning',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('[b]bold text');
+      expect(result.toBBCode(), '[b]bold text[/b]');
+    },
+  );
+
+  test(
+    'broken single bold tag in the middle',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('text [b]bold');
+      expect(result.toBBCode(), 'text [b]bold[/b]');
+    },
+  );
+
+  test(
+    'broken tag in the middle',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('text [b bold');
+      expect(result.toBBCode(), 'text [b bold');
+    },
+  );
+
+  test(
+    'open tag at the end',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('text[b]');
+      expect(result.toBBCode(), 'text[b][/b]');
+    },
+  );
+
+  test(
+    'broken single closing bold tag at beginning',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('[/b]bold text');
+      expect(result.toBBCode(), '[/b]bold text');
+    },
+  );
+
+  test(
+    'broken single closing bold tag in the middle',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('text[/b] bold');
+      expect(result.toBBCode(), 'text[/b] bold');
+    },
+  );
+
+  test(
+    'broken single closing bold tag at end',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('bold text[/b]');
+      expect(result.toBBCode(), 'bold text[/b]');
+    },
+  );
+
+  test(
+    'two open tags without closing',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('[b]bold [u]underline');
+      expect(result.toBBCode(), '[b]bold [u]underline[/u][/b]');
+    },
+  );
+
+  test(
+    'unknown single tag at beginning',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('[x]broken text');
+      expect(result.toBBCode(), '[x]broken text');
+    },
+  );
+
+  test(
+    'unknown single tag at end',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('broken text[x]');
+      expect(result.toBBCode(), 'broken text[x]');
+    },
+  );
+
+  test(
+    'unknown single tag in the middle',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('broken [x] text');
+      expect(result.toBBCode(), 'broken [x] text');
+    },
+  );
+
+  test(
+    'unknown closing single tag in the middle',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('broken [/x] text');
+      expect(result.toBBCode(), 'broken [/x] text');
+    },
+  );
+
+  test(
+    'unknown tags',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('[x]broken text[/x]');
+      expect(result.toBBCode(), '[x]broken text[/x]');
+    },
+  );
+
+  test(
+    'emoji in bold tags',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('[b]:)[/b]');
+      expect(result.toBBCode(), '[b]:)[/b]');
+    },
+  );
+
+  test(
+    'emoji in underline tags',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('[u]:)[/u]');
+      expect(result.toBBCode(), '[u]:)[/u]');
+    },
+  );
+
+  test(
+    'unordered list with closing tags',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('[list][*]item 1[/*][*]item 2[/*][/list]');
+      expect(result.toBBCode(), '''[list]
+[*]item 1
+[*]item 2
+[/list]''');
+    },
+  );
+
+  test(
+    'unordered list',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('[list][*]item 1[*]item 2[/list]');
+      expect(result.toBBCode(), '''[list]
+[*]item 1
+[*]item 2
+[/list]''');
+    },
+  );
+
+  test(
+    'ordered numeric list',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('[list=1][*]item 1[*]item 2[/list]');
+      expect(result.toBBCode(), '''[list=1]
+[*]item 1
+[*]item 2
+[/list]''');
+    },
+  );
+
+  test(
+    'ordered alphabetic list',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('[list=a][*]item 1[*]item 2[/list]');
+      expect(result.toBBCode(), '''[list=a]
+[*]item 1
+[*]item 2
+[/list]''');
+    },
+  );
+
+  test(
+    'unordered list with bold item',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('[list][*][b]item 1[*]item 2[/b][/list]');
+      expect(result.toBBCode(), '''[list]
+[*][b]item 1[/b]
+[*]item 2[/b]
+[/list]''');
+    },
+  );
+
+  test(
+    'unordered list with closing tags not again opened',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('[list][*]item 1[/*]item 2[/list]');
+      expect(result.toBBCode(), '''[list]
+[*]item 1
+[*]item 2
+[/list]''');
+    },
+  );
+
+  test(
+    'unordered list with closing tags not again opened and three items',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('[list][*]item 1[/*]item 2[*]item 3[/list]');
+      expect(result.toBBCode(), '''[list]
+[*]item 1
+[*]item 2
+[*]item 3
+[/list]''');
+    },
+  );
+
+  test(
+    'unordered list without item tag',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('[list]item 1[/list]');
+      expect(result.toBBCode(), '''[list]
+[*]item 1
+[/list]''');
+    },
+  );
+
+  test(
+    'unordered list without item tag and closing tag',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('[list]item 1');
+      expect(result.toBBCode(), '''[list]
+[*]item 1
+[/list]''');
+    },
+  );
+
+  test(
+    'bold unordered list without item tag and closing tag',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('[b][list]item 1');
+      expect(result.toBBCode(), '''[b][list]
+[*]item 1
+[/list][/b]''');
+    },
+  );
+
+  test(
+    'empty unordered list',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('[list][/list]');
+      expect(result.toBBCode(), '''[list]
+[/list]''');
+    },
+  );
+
+  test(
+    'empty unordered list without closing tag',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('[list]');
+      expect(result.toBBCode(), '''[list]
+[/list]''');
+    },
+  );
+
+  test(
+    'item without list',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('[*]item 1');
+      expect(result.toBBCode(), '[*]item 1');
+    },
+  );
+
+  test(
+    'items without list',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('[*]item 1[*]item 2');
+      expect(result.toBBCode(), '[*]item 1[*]item 2');
+    },
+  );
+
+  test(
+    'list with items with spaces',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('[list][*] item 1 [*] item 2 [/list]');
+      expect(result.toBBCode(), '''[list]
+[*]item 1
+[*]item 2
+[/list]''');
+    },
+  );
+
+  test(
+    'list with bold items with spaces',
+    () {
+      final BBCodeDocument result = bbCodeParser
+          .parse('[list][*][b] item 1[/b] [*] [b]item 2 [/b][/list]');
+      expect(result.toBBCode(), '''[list]
+[*][b] item 1[/b]
+[*][b]item 2 [/b]
+[/list]''');
+    },
+  );
+
+  test(
+    'list with bold and normal items with spaces',
+    () {
+      final BBCodeDocument result = bbCodeParser
+          .parse('[list][*] item [b]bold[/b] 1 [*] item[b] bold [/b]2 [/list]');
+      expect(result.toBBCode(), '''[list]
+[*]item [b]bold[/b] 1
+[*]item[b] bold [/b]2
+[/list]''');
+    },
+  );
+
+  test(
+    'unordered list with new lines',
+    () {
+      final BBCodeDocument result = bbCodeParser.parse('''[list]
+[*]item 1
+[*]item 2
+[/list]''');
+      expect(result.toBBCode(), '''[list]
+[*]item 1
+[*]item 2
+[/list]''');
+    },
+  );
+
+  test(
+    'table',
+    () {
+      final BBCodeDocument result =
+          bbCodeParser.parse('[table] a [||] b [--] c [||] d [/table]');
+      expect(result.toBBCode(), '''[table]
+a[||]b[--]
+c[||]d
+[/table]''');
+    },
+  );
+
+  test(
+    'table with border=0',
+    () {
+      final BBCodeDocument result = bbCodeParser
+          .parse('[table border=0] a [||] b [--] c [||] d [/table]');
+      expect(result.toBBCode(), '''[table border=0]
+a[||]b[--]
+c[||]d
+[/table]''');
+    },
+  );
 }
