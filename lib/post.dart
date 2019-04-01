@@ -100,11 +100,21 @@ class Post {
       }
       final xml.XmlElement posts = candidates.first;
 
-      if (int.parse(posts.getAttribute('count')) != 1) {
+      // ensure that at least one post was returned
+      if (int.parse(posts.getAttribute('count')) == 0) {
         throw Exception('post not found');
       }
 
-      final xml.XmlElement post = posts.children[0];
+      // ensure that the requested post ID is actually returned
+      xml.XmlElement post;
+      for (final xml.XmlElement postChild in posts.children) {
+        if (int.parse(postChild.getAttribute('id')) == postId) {
+          post = postChild;
+        }
+      }
+      if (post == null) {
+        throw Exception('post not found');
+      }
 
       // the element 'post' should contain an element 'user'
       candidates = post.findElements('user');

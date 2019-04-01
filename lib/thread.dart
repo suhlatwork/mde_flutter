@@ -301,7 +301,10 @@ class Thread with TemplateFiller {
           if (candidates.length != 1) {
             throw Exception('token-setbookmark element missing from post!');
           }
+          postInfo['canSetBookmarkToken'] = true;
           postInfo['setBookmarkToken'] = candidates.first.getAttribute('value');
+        } else {
+          postInfo['canSetBookmarkToken'] = false;
         }
 
         // if the post was created by the current user, the element 'post'

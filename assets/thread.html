@@ -32,9 +32,9 @@
          data-user-id="{{authorId}}"
          data-user-avatar="{{avatar}}"
          data-user-avatar-id="{{avatarId}}"
-         {{#isLoggedIn}}
+         {{#canSetBookmarkToken}}
          data-bookmark-token="{{setBookmarkToken}}"
-         {{/isLoggedIn}}
+         {{/canSetBookmarkToken}}
          {{#canEditPost}}
          data-editreply-token="{{editReplyToken}}"
          {{/canEditPost}}
