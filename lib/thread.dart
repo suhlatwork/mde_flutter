@@ -187,6 +187,8 @@ class Thread with TemplateFiller {
         postInfo['author'] = user.text;
         postInfo['authorId'] = int.parse(user.getAttribute('id'));
 
+        postInfo['getAuthorLocked'] = user.getAttribute('locked') != null;
+
         // the element 'post' should contain an element 'avatar'
         candidates = post.findElements('avatar');
         if (candidates.length != 1) {
@@ -321,7 +323,6 @@ class Thread with TemplateFiller {
         }
 
         postInfo['isAuthor'] = false;
-        postInfo['getAuthorLocked'] = false;
 
         List posts = threadInfo['posts'];
         posts.add(postInfo);
