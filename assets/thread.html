@@ -39,28 +39,34 @@
          data-editreply-token="{{editReplyToken}}"
          {{/canEditPost}}
     >
+        {{#validId}}
         <a name="{{id}}"></a>
+        {{/validId}}
         <div class="header">
-            {{#isLoggedIn}}
+            {{#showPostMenu}}
             <div class="post-buttons">
                 <button class="post-menu-button"><i class="material-icons">&#xE5D4;</i></button>
                 <div class="post-menu post-menu-hidden">
+                    {{#canSetBookmarkToken}}
                     <div class="post-menu-item post-menu-item-bookmark">
                         Bookmark setzen
                     </div>
+                    {{/canSetBookmarkToken}}
                     {{#canEditPost}}
                     <div class="post-menu-item post-menu-item-edit">
                         Beitrag bearbeiten
                     </div>
                     {{/canEditPost}}
+                    {{#validId}}
                     {{#canCreatePost}}
                     <div class="post-menu-item post-menu-item-cite">
                         Beitrag zitieren
                     </div>
                     {{/canCreatePost}}
+                    {{/validId}}
                 </div>
             </div>
-            {{/isLoggedIn}}
+            {{/showPostMenu}}
             <div class="bender" {{&avatarBackground}}></div>
             <div class="info">
                 <h4 class="author">

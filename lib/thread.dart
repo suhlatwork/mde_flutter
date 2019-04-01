@@ -177,6 +177,7 @@ class Thread with TemplateFiller {
         Map<String, Object> postInfo = {};
 
         postInfo['id'] = int.parse(post.getAttribute('id'));
+        postInfo['validId'] = postInfo['id'] != 0;
 
         // the element 'post' should contain an element 'user'
         candidates = post.findElements('user');
@@ -321,6 +322,11 @@ class Thread with TemplateFiller {
         } else {
           postInfo['canEditPost'] = false;
         }
+
+        postInfo['showPostMenu'] = threadInfo['isLoggedIn'] &&
+            (postInfo['canSetBookmarkToken'] ||
+                postInfo['canSetBookmarkToken'] ||
+                (postInfo['validId'] && threadInfo['canCreatePost']));
 
         List posts = threadInfo['posts'];
         posts.add(postInfo);
