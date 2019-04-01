@@ -322,13 +322,9 @@ class Thread with TemplateFiller {
           postInfo['canEditPost'] = false;
         }
 
-        postInfo['isAuthor'] = false;
-
         List posts = threadInfo['posts'];
         posts.add(postInfo);
       }
-
-      threadInfo['showButtons'] = true;
 
       await Future.wait(avatarLoaders.values);
       await Future.wait(avatarSetters);
