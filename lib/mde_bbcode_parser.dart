@@ -461,3 +461,41 @@ class MDEBBCodeParser extends BBCodeParser {
           htmlPostProcessor: _processMDEBBCode,
         );
 }
+
+BBCodePart _transformImageToUrl(BBCodePart part) {
+  if (part.tag == null) {
+    if (part.parts != null) {
+      throw Error();
+    }
+    return part.deepCopy();
+  }
+
+  BBCodePart copy;
+  if (part.tag.bbTag == 'img') {
+    copy =
+        BBCodePart(_UrlTag(), part.bbCode, List<BBCodePart>(), part.argument);
+  } else {
+    copy = BBCodePart(part.tag, part.bbCode, List<BBCodePart>(), part.argument);
+  }
+
+  part.parts.forEach(
+    (element) {
+      copy.parts.add(_transformImageToUrl(element));
+    },
+  );
+
+  return copy;
+}
+
+BBCodeDocument transformImageToUrl(BBCodeDocument document) {
+  BBCodeDocument copy = BBCodeDocument(document.bbCode, List<BBCodePart>(),
+      htmlPostProcessor: document.htmlPostProcessor);
+
+  document.parts.forEach(
+    (element) {
+      copy.parts.add(_transformImageToUrl(element));
+    },
+  );
+
+  return copy;
+}

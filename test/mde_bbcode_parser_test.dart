@@ -256,6 +256,46 @@ void main() {
   );
 
   test(
+    'transform img to url',
+    () {
+      final BBCodeDocument result = transformImageToUrl(mdebbCodeParser
+          .parse('[img]https://flutter.dev/images/favicon.png[/img]'));
+      expect(result.toHtml(),
+          '<a href="https://flutter.dev/images/favicon.png">https:&#47;&#47;flutter.dev&#47;images&#47;favicon.png</a>');
+    },
+  );
+
+  test(
+    'transform img to url in url',
+    () {
+      final BBCodeDocument result = transformImageToUrl(mdebbCodeParser.parse(
+          '[url=https://flutter.dev][img]https://flutter.dev/images/favicon.png[/img][/url]'));
+      expect(result.toHtml(),
+          '<a href="https://flutter.dev"><a href="https://flutter.dev/images/favicon.png">https:&#47;&#47;flutter.dev&#47;images&#47;favicon.png</a></a>');
+    },
+  );
+
+  test(
+    'transform img to url in url with text',
+    () {
+      final BBCodeDocument result = transformImageToUrl(mdebbCodeParser.parse(
+          '[url=https://flutter.dev][img]https://flutter.dev/images/favicon.png[/img] text[/url]'));
+      expect(result.toHtml(),
+          '<a href="https://flutter.dev"><a href="https://flutter.dev/images/favicon.png">https:&#47;&#47;flutter.dev&#47;images&#47;favicon.png</a> text</a>');
+    },
+  );
+
+  test(
+    'transform img to url in tags',
+    () {
+      final BBCodeDocument result = transformImageToUrl(mdebbCodeParser.parse(
+          '[b]text [img]https://flutter.dev/images/favicon.png[/img] text[/b]'));
+      expect(result.toHtml(),
+          '<strong>text <a href="https://flutter.dev/images/favicon.png">https:&#47;&#47;flutter.dev&#47;images&#47;favicon.png</a> text</strong>');
+    },
+  );
+
+  test(
     'no container tag',
     () {
       final BBCodeDocument result = mdebbCodeParser.parse('[code]text[/code]');
@@ -478,6 +518,46 @@ void main() {
           .parse('[video]https://www.youtube.com/embed/fq4N0hgOWzU[/video]');
       expect(result.toBBCode(),
           '[video]https://www.youtube.com/embed/fq4N0hgOWzU[/video]');
+    },
+  );
+
+  test(
+    'transform img to url',
+    () {
+      final BBCodeDocument result = transformImageToUrl(mdebbCodeParser
+          .parse('[img]https://flutter.dev/images/favicon.png[/img]'));
+      expect(result.toBBCode(),
+          '[url]https://flutter.dev/images/favicon.png[/url]');
+    },
+  );
+
+  test(
+    'transform img to url in url',
+    () {
+      final BBCodeDocument result = transformImageToUrl(mdebbCodeParser.parse(
+          '[url=https://flutter.dev][img]https://flutter.dev/images/favicon.png[/img][/url]'));
+      expect(result.toBBCode(),
+          '[url=https://flutter.dev][url]https://flutter.dev/images/favicon.png[/url][/url]');
+    },
+  );
+
+  test(
+    'transform img to url in url with text',
+    () {
+      final BBCodeDocument result = transformImageToUrl(mdebbCodeParser.parse(
+          '[url=https://flutter.dev][img]https://flutter.dev/images/favicon.png[/img] text[/url]'));
+      expect(result.toBBCode(),
+          '[url=https://flutter.dev][url]https://flutter.dev/images/favicon.png[/url] text[/url]');
+    },
+  );
+
+  test(
+    'transform img to url in tags',
+    () {
+      final BBCodeDocument result = transformImageToUrl(mdebbCodeParser.parse(
+          '[b]text [img]https://flutter.dev/images/favicon.png[/img] text[/b]'));
+      expect(result.toBBCode(),
+          '[b]text [url]https://flutter.dev/images/favicon.png[/url] text[/b]');
     },
   );
 }
