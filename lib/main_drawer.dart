@@ -26,39 +26,41 @@ import 'mde_account.dart';
 
 class MainDrawer extends StatefulWidget {
   final Completer<WebViewController> controllerCompleter;
-  final Future<bool> _canNavigateBack;
-  final Future<bool> _canNavigateForward;
-  final Future<String> _userName;
-  final Future<List<BookmarkItem>> _bookmarkList;
-  final Future<PackageInfo> _packageInfo;
 
   MainDrawer({
     Key key,
     @required this.controllerCompleter,
-  })  : _canNavigateBack = controllerCompleter.future
-            .then((controller) => controller.canGoBack()),
-        _canNavigateForward = controllerCompleter.future
-            .then((controller) => controller.canGoForward()),
-        _userName = MDEAccount.userName(),
-        _bookmarkList = Bookmarks().bookmarkListCompleter.future,
-        _packageInfo = PackageInfo.fromPlatform(),
-        super(key: key);
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MainDrawerState();
 }
 
 class _MainDrawerState extends State<MainDrawer> {
+  Future<bool> _canNavigateBack;
+  Future<bool> _canNavigateForward;
+  Future<String> _userName;
+  Future<List<BookmarkItem>> _bookmarkList;
+  Future<PackageInfo> _packageInfo;
+
   @override
   void initState() {
     super.initState();
+
+    _canNavigateBack = widget.controllerCompleter.future
+        .then((controller) => controller.canGoBack());
+    _canNavigateForward = widget.controllerCompleter.future
+        .then((controller) => controller.canGoForward());
+    _userName = MDEAccount.userName();
+    _bookmarkList = Bookmarks().bookmarkListCompleter.future;
+    _packageInfo = PackageInfo.fromPlatform();
   }
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: FutureBuilder(
-        future: widget._bookmarkList,
+        future: _bookmarkList,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           List<Widget> children = [
             ListTile(
@@ -86,7 +88,7 @@ class _MainDrawerState extends State<MainDrawer> {
                     },
                   ),
                   FutureBuilder(
-                    future: widget._canNavigateBack,
+                    future: _canNavigateBack,
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
                       if (snapshot.connectionState == ConnectionState.done &&
                           snapshot.data) {
@@ -105,7 +107,7 @@ class _MainDrawerState extends State<MainDrawer> {
                     },
                   ),
                   FutureBuilder(
-                    future: widget._canNavigateForward,
+                    future: _canNavigateForward,
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
                       if (snapshot.connectionState == ConnectionState.done &&
                           snapshot.data) {
@@ -129,7 +131,7 @@ class _MainDrawerState extends State<MainDrawer> {
             ),
             Divider(),
             FutureBuilder(
-              future: widget._userName,
+              future: _userName,
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (snapshot.data != null) {
@@ -272,7 +274,7 @@ class _MainDrawerState extends State<MainDrawer> {
 
           children.add(
             FutureBuilder(
-              future: widget._packageInfo,
+              future: _packageInfo,
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   return AboutListTile(
