@@ -560,4 +560,14 @@ void main() {
           '[b]text [url]https://flutter.dev/images/favicon.png[/url] text[/b]');
     },
   );
+
+  test(
+    'transform document to quote',
+    () {
+      final BBCodeDocument result = transformDocumentToQuote(
+          1, 1, '[CSF]Omega', mdebbCodeParser.parse('text [u]underlined[/u]'));
+      expect(result.toBBCode(),
+          '[quote=1,1,"[CSF]Omega"][b]text [u]underlined[/u][/b][/quote]');
+    },
+  );
 }

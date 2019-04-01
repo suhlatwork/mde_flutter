@@ -23,6 +23,7 @@ import 'package:html/dom.dart' as html;
 import 'package:html/parser.dart' show parse;
 
 import 'mde_account.dart';
+import 'mde_bbcode_parser.dart';
 import 'mde_codec.dart';
 import 'mde_icons.dart';
 import 'post.dart';
@@ -301,10 +302,12 @@ class _PostEditorState extends State<PostEditor> {
         post.postAuthor.future,
         post.postContent.future,
       ]).then((values) {
-        _initialPostContent
-            .complete('''[quote=$threadId,$postId,"${values[0]}"][b]
-${values[1]}
-[/b][/quote]''');
+        _initialPostContent.complete(transformDocumentToQuote(
+                threadId,
+                postId,
+                values[0],
+                transformImageToUrl(MDEBBCodeParser().parse(values[1])))
+            .toBBCode());
       });
     }
   }

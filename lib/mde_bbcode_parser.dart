@@ -16,6 +16,7 @@
 
 import 'dart:convert';
 
+import 'bbcode_tags.dart';
 import 'bbcode_parser.dart';
 export 'bbcode_parser.dart';
 
@@ -496,6 +497,25 @@ BBCodeDocument transformImageToUrl(BBCodeDocument document) {
       copy.parts.add(_transformImageToUrl(element));
     },
   );
+
+  return copy;
+}
+
+BBCodeDocument transformDocumentToQuote(
+    int threadId, int postId, String author, BBCodeDocument document) {
+  BBCodeDocument copy = document.deepCopy();
+
+  BBCodePart quote = BBCodePart(
+      _QuoteTag(),
+      document.bbCode,
+      [
+        BBCodePart(BBCodeBoldTag(), document.bbCode, copy.parts),
+      ],
+      '$threadId,$postId,"$author"');
+
+  copy.parts = [
+    quote,
+  ];
 
   return copy;
 }
